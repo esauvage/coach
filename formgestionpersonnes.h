@@ -11,6 +11,7 @@ class FormGestionPersonnes;
 
 class FormEditPersonne;
 class QDialogButtonBox;
+class DbManager;
 
 class FormGestionPersonnes : public QWidget
 {
@@ -26,10 +27,13 @@ private slots:
     void ajoutValide();
 
 private:
-    Ui::FormGestionPersonnes *ui;
+	void populateComboBox();
+
+	Ui::FormGestionPersonnes *ui;
     FormEditPersonne * _formEdtPers = nullptr;
     QDialogButtonBox * _hlayout = nullptr;
-    Personne personne;
+	DbManager * _dbManager = nullptr;
+	Personne personne;
 };
 
 #endif // FORMGESTIONPERSONNES_H

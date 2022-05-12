@@ -14,12 +14,7 @@ FormGestionPersonnes::FormGestionPersonnes(QWidget *parent) :
 {
     ui->setupUi(this);
     CoachApplication * app = dynamic_cast<CoachApplication *>(QApplication::instance());
-    DbManager * dbManager = app->dbManager();
-    QList<Personne> personnes = dbManager->getPersonnes();
-    for (auto p : personnes)
-    {
-        ui->comboBox->addItem(p.nom());
-    }
+	populateComboBox();
 }
 
 FormGestionPersonnes::~FormGestionPersonnes()
@@ -72,10 +67,16 @@ void FormGestionPersonnes::ajoutValide()
     ui->verticalLayout->removeWidget(_hlayout);
     delete _hlayout;
     _hlayout = nullptr;
-    QList<Personne> personnes = dbManager->getPersonnes();
-    for (auto p : personnes)
-    {
-        ui->comboBox->addItem(p.nom());
-    }
+	populateComboBox();
     update();
+}
+
+void FormGestionPersonnes::populateComboBox()
+{
+	ui->comboBox->clear();
+	QList<Personne> personnes = _dbManager->getPersonnes();
+	for (auto p : personnes)
+	{
+		ui->comboBox->addItem(p.nom());
+	}
 }
