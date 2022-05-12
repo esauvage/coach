@@ -19,8 +19,12 @@ public:
     CoachMainWindow(QWidget *parent = nullptr);
     ~CoachMainWindow();
 
+private slots:
+    void on_pushButton_clicked();
+
 private:
     Ui::CoachMainWindow *ui;
     QList <Personne> _personnes;
+    QWidget * _accueil;
 };
 #endif // COACHMAINWINDOW_H

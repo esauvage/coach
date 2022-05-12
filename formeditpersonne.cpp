@@ -68,3 +68,8 @@ void FormEditPersonne::on_edtDeces_editingFinished()
 {
     _personne.setDateDeces(ui->edtDeces->dateTime());
 }
+
+Personne &FormEditPersonne::personne() const
+{
+    return _personne;
+}

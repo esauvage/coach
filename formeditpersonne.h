@@ -19,6 +19,8 @@ public:
     ~FormEditPersonne();
     void setPersonne(Personne &personne);
 
+    Personne &personne() const;
+
 private slots:
     void on_edtNom_editingFinished();
 

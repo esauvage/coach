@@ -1,12 +1,11 @@
 #include "coachmainwindow.h"
 
-#include <QApplication>
-#include "dbmanager.h"
+#include "coachapplication.h"
+#include <QVariant>
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    DbManager dbManager("G:/EtienneArea/Personnel/coach.db");
+    CoachApplication a(argc, argv);
     CoachMainWindow w;
     w.show();
     return a.exec();

@@ -9,21 +9,26 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    coachapplication.cpp \
     dbmanager.cpp \
     formeditpersonne.cpp \
+    formgestionpersonnes.cpp \
     main.cpp \
     coachmainwindow.cpp \
     personne.cpp
 
 HEADERS += \
+    coachapplication.h \
     coachmainwindow.h \
     dbmanager.h \
     formeditpersonne.h \
+    formgestionpersonnes.h \
     personne.h
 
 FORMS += \
     coachmainwindow.ui \
-    formeditpersonne.ui
+    formeditpersonne.ui \
+    formgestionpersonnes.ui
 
 TRANSLATIONS += \
     Coach_fr_FR.ts
