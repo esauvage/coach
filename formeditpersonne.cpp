@@ -23,7 +23,6 @@ void FormEditPersonne::setPersonne(Personne &personne)
     _edtPrenoms << new QLineEdit();
     ui->widget->layout()->addWidget(_edtPrenoms.last());
     connect(_edtPrenoms.last(), SIGNAL(editingFinished()), this, SLOT(prenomsEdited()));
-//    ui->lineEdit_2->setText(personne.prenom());
     ui->edtNaissance->setDateTime(personne.dateNaissance());
     ui->edtDeces->setDateTime(personne.dateDeces());
 }
