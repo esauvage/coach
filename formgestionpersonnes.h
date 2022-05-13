@@ -25,6 +25,9 @@ private slots:
     void on_btnAjout_clicked();
     void ajoutAnnule();
     void ajoutValide();
+    void modifValide();
+
+    void on_comboBox_currentIndexChanged(int index);
 
 private:
 	void populateComboBox();

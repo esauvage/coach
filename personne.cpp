@@ -64,3 +64,13 @@ void Personne::setMereBiologique(Personne *mereBiologique)
 {
     _mereBiologique = mereBiologique;
 }
+
+int Personne::id() const
+{
+    return _id;
+}
+
+void Personne::setId(int id)
+{
+    _id = id;
+}

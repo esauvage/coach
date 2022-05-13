@@ -12,6 +12,8 @@ public:
     DbManager(const QString& path);
     QList<Personne> getPersonnes() const;
     void addPersonne(const Personne & v) const;
+    void modifPersonne(const Personne & v) const;
+    Personne getPersonne(const int id) const;
 private:
     QSqlDatabase m_db;
 };

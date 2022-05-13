@@ -26,6 +26,9 @@ public:
     Personne *mereBiologique() const;
     void setMereBiologique(Personne *mereBiologique);
 
+    int id() const;
+    void setId(int id);
+
 private:
     QString _nom;
     QString _prenom;
@@ -33,6 +36,7 @@ private:
     QDateTime _dateDeces;
     Personne * _pereBiologique = nullptr;
     Personne * _mereBiologique = nullptr;
+    int _id;//On a besoin d'un identifiant
 };
 
 #endif // PERSONNE_H
