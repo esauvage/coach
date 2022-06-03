@@ -3,12 +3,14 @@
 
 #include "formeditpersonne.h"
 #include "formgestionpersonnes.h"
+#include "formgestionseances.h"
 
 CoachMainWindow::CoachMainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::CoachMainWindow)
 {
     ui->setupUi(this);
+    _accueil = ui->centralwidget;
 }
 
 CoachMainWindow::~CoachMainWindow()
@@ -17,9 +19,14 @@ CoachMainWindow::~CoachMainWindow()
 }
 
 
-void CoachMainWindow::on_pushButton_clicked()
+void CoachMainWindow::on_btnPersonnes_clicked()
 {
-    _accueil = ui->centralwidget;
     FormGestionPersonnes * gestionPers = new FormGestionPersonnes();
     setCentralWidget(gestionPers);
+}
+
+void CoachMainWindow::on_btnSeance_clicked()
+{
+    FormGestionSeances * gestionSeance = new FormGestionSeances();
+    setCentralWidget(gestionSeance);
 }

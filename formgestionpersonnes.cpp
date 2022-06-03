@@ -13,7 +13,6 @@ FormGestionPersonnes::FormGestionPersonnes(QWidget *parent) :
     ui(new Ui::FormGestionPersonnes)
 {
     ui->setupUi(this);
-    CoachApplication * app = dynamic_cast<CoachApplication *>(QApplication::instance());
 	populateComboBox();
 }
 
@@ -52,6 +51,7 @@ void FormGestionPersonnes::ajoutAnnule()
     ui->verticalLayout->removeWidget(_hlayout);
     delete _hlayout;
     _hlayout = nullptr;
+    ui->comboBox->setCurrentIndex(0);
     update();
 }
 
@@ -83,6 +83,21 @@ void FormGestionPersonnes::modifValide()
     update();
 }
 
+void FormGestionPersonnes::supprime()
+{
+    _dbManager->supprimePersonne(_formEdtPers->personne());
+    ui->btnAjout->show();
+    ui->verticalLayout->removeWidget(_formEdtPers);
+    delete _formEdtPers;
+    _formEdtPers = nullptr;
+    ui->verticalLayout->removeWidget(_hlayout);
+    delete _hlayout;
+    _hlayout = nullptr;
+    ui->comboBox->setCurrentIndex(0);
+    populateComboBox();
+    update();
+}
+
 void FormGestionPersonnes::populateComboBox()
 {
 	ui->comboBox->clear();
@@ -104,16 +119,21 @@ void FormGestionPersonnes::on_comboBox_currentIndexChanged(int index)
     {
         _formEdtPers = new FormEditPersonne(personne);
     }
+    else
+        _formEdtPers->setPersonne(personne);
     ui->verticalLayout->addWidget(_formEdtPers);
     if (!_hlayout)
     {
         QPushButton * btnValider = new QPushButton("Modifier");
         QPushButton * btnAnnuler = new QPushButton("Annuler");
+        QPushButton * btnSupprimer = new QPushButton("Supprimer");
         connect(btnValider, SIGNAL(clicked()), this, SLOT(modifValide()));
         connect(btnAnnuler, SIGNAL(clicked()), this, SLOT(ajoutAnnule()));
+        connect(btnSupprimer, SIGNAL(clicked()), this, SLOT(supprime()));
         _hlayout = new QDialogButtonBox();
         _hlayout->addButton(btnValider, QDialogButtonBox::ActionRole);
         _hlayout->addButton(btnAnnuler, QDialogButtonBox::ActionRole);
+        _hlayout->addButton(btnSupprimer, QDialogButtonBox::ActionRole);
     }
     ui->verticalLayout->addWidget(_hlayout);
 }

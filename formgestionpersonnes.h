@@ -26,6 +26,7 @@ private slots:
     void ajoutAnnule();
     void ajoutValide();
     void modifValide();
+    void supprime();
 
     void on_comboBox_currentIndexChanged(int index);
 

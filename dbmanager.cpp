@@ -71,6 +71,20 @@ void DbManager::modifPersonne(const Personne &v) const
     qDebug() << update.lastError();
 }
 
+void DbManager::supprimePersonne(const Personne &v) const
+{
+    QSqlQuery update;
+    update.prepare("DELETE FROM PERSONNES WHERE NOM = :nom AND DATE_NAISSANCE = :naissance AND DATE_DECES = :deces AND ID = :id");
+    update.bindValue(":nom", v.nom());
+    update.bindValue(":naissance", v.dateNaissance());
+    update.bindValue(":deces", v.dateDeces());
+    update.bindValue(":id", v.id());
+    qDebug() << update.lastQuery();
+    update.exec();
+    qDebug() << update.executedQuery();
+    qDebug() << update.lastError();
+}
+
 Personne DbManager::getPersonne(const int id) const
 {
     Personne r;

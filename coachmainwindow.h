@@ -20,7 +20,9 @@ public:
     ~CoachMainWindow();
 
 private slots:
-    void on_pushButton_clicked();
+    void on_btnPersonnes_clicked();
+
+    void on_btnSeance_clicked();
 
 private:
     Ui::CoachMainWindow *ui;
