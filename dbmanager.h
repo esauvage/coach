@@ -5,6 +5,7 @@
 #include <QSqlDatabase>
 
 #include "personne.h"
+#include "seance.h"
 
 class DbManager
 {
@@ -15,6 +16,11 @@ public:
     void modifPersonne(const Personne & v) const;
     void supprimePersonne(const Personne & v) const;
     Personne getPersonne(const int id) const;
+    QList<Seance> getSeances() const;
+    void addSeance(const Seance & v) const;
+    void modifSeance(const Seance & v) const;
+    void supprimeSeance(const Seance & v) const;
+    Seance getSeance(const int id) const;
 private:
     QSqlDatabase m_db;
 };

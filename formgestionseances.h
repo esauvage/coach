@@ -3,9 +3,15 @@
 
 #include <QWidget>
 
+#include "seance.h"
+
 namespace Ui {
 class FormGestionSeances;
 }
+
+class FormEditSeance;
+class QDialogButtonBox;
+class DbManager;
 
 class FormGestionSeances : public QWidget
 {
@@ -14,9 +20,17 @@ class FormGestionSeances : public QWidget
 public:
     explicit FormGestionSeances(QWidget *parent = nullptr);
     ~FormGestionSeances();
+private slots:
+    void on_btnAjout_clicked();
+    void ajoutAnnule();
+    void ajoutValide();
 
 private:
     Ui::FormGestionSeances *ui;
+    FormEditSeance * _formEdtSeance = nullptr;
+    QDialogButtonBox * _hlayout = nullptr;
+    DbManager * _dbManager = nullptr;
+    Seance _seance;
 };
 
 #endif // FORMGESTIONSEANCES_H

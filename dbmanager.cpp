@@ -13,6 +13,15 @@
 	"DATE_DECES" DATETIME,
 	PRIMARY KEY ("ID" AUTOINCREMENT)
 );
+CREATE TABLE SEANCES (
+    "ID"	INTEGER NOT NULL,
+    "DATE"	DATE NOT NULL,
+    "DEBUT"	 TIME NOT NULL,
+    "FIN"	 TIME NOT NULL,
+    "PERSONNE_ID" INTEGER NOT NULL,
+    PRIMARY KEY ("ID" AUTOINCREMENT),
+    FOREIGN KEY ("PERSONNE_ID") REFERENCES "PERSONNES"("ID")
+);
 */
 DbManager::DbManager(const QString& path)
 {
@@ -97,6 +106,79 @@ Personne DbManager::getPersonne(const int id) const
         r.setNom(query.value(1).toString());
         r.setDateNaissance(query.value(2).toDateTime());
         r.setDateDeces(query.value(3).toDateTime());
+    }
+    return r;
+}
+
+QList<Seance> DbManager::getSeances() const
+{
+    QList <Seance> r;
+    QSqlQuery query("SELECT ID, DATE, DEBUT, FIN, PERSONNE_ID FROM PERSONNES");
+    while (query.next()) {
+        Seance p;
+        p.setId(query.value(0).toInt());
+        p.setDate(query.value(1).toDate());
+        p.setDebut(query.value(2).toTime());
+        p.setFin(query.value(3).toTime());
+        r << p;
+    }
+    return r;
+}
+
+void DbManager::addSeance(const Seance &v) const
+{
+    QSqlQuery insert;
+    insert.prepare("INSERT INTO SEANCES (DATE, DEBUT, FIN, PERSONNE_ID) VALUES (:date, :debut, :fin, :personneId)");
+    insert.bindValue(":date", v.date());
+    insert.bindValue(":debut", v.debut());
+    insert.bindValue(":fin", v.fin());
+    insert.bindValue(":personneId", v.personne()->id());
+    qDebug() << insert.lastQuery();
+    insert.exec();
+    qDebug() << insert.executedQuery();
+    qDebug() << insert.lastError();
+}
+
+void DbManager::modifSeance(const Seance &v) const
+{
+    QSqlQuery update;
+    update.prepare("UPDATE SEANCES SET DATE = :date, DEBUT = :debut, FIN = :deces WHERE ID = :id");
+    update.bindValue(":date", v.date());
+    update.bindValue(":debut", v.debut());
+    update.bindValue(":fin", v.fin());
+    update.bindValue(":id", v.id());
+    qDebug() << update.lastQuery();
+    update.exec();
+    qDebug() << update.executedQuery();
+    qDebug() << update.lastError();
+}
+
+void DbManager::supprimeSeance(const Seance &v) const
+{
+    QSqlQuery update;
+    update.prepare("DELETE FROM SEANCES WHERE DATE = :date AND DEBUT = :debut AND FIN = :fin AND ID = :id");
+    update.bindValue(":date", v.date());
+    update.bindValue(":debut", v.debut());
+    update.bindValue(":fin", v.fin());
+    update.bindValue(":id", v.id());
+    qDebug() << update.lastQuery();
+    update.exec();
+    qDebug() << update.executedQuery();
+    qDebug() << update.lastError();
+}
+
+Seance DbManager::getSeance(const int id) const
+{
+    Seance r;
+    QSqlQuery query;
+    query.prepare("SELECT ID, DATE, DEBUT, FIN FROM SEANCES WHERE ID = :id");
+    query.bindValue(":id", id);
+    query.exec();
+    if (query.next()) {
+        r.setId(query.value(0).toInt());
+        r.setDate(query.value(1).toDate());
+        r.setDebut(query.value(2).toTime());
+        r.setFin(query.value(3).toTime());
     }
     return r;
 }
