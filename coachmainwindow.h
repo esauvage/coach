@@ -3,9 +3,8 @@
 
 #include <QMainWindow>
 
-#include <QList>
-
-#include "personne.h"
+class Personne;
+class FormEditPersonne;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class CoachMainWindow; }
@@ -20,13 +19,11 @@ public:
     ~CoachMainWindow();
 
 private slots:
-    void on_btnPersonnes_clicked();
-
-    void on_btnSeance_clicked();
+	void onEditPersonneRequested(Personne & p);
+	void onCurUserChanged();
 
 private:
     Ui::CoachMainWindow *ui;
-    QList <Personne> _personnes;
-    QWidget * _accueil;
+	FormEditPersonne *_formEditPersonne;
 };
 #endif // COACHMAINWINDOW_H

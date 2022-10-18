@@ -1,14 +1,20 @@
 #include "formeditpersonne.h"
 #include "ui_formeditpersonne.h"
 
+#include "dbmanager.h"
+#include "coachapplication.h"
+
 FormEditPersonne::FormEditPersonne(Personne &personne, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::FormEditPersonne),
-    _personne(personne)
+	_personne(personne),
+	_dbManager(nullptr)
 {
     ui->setupUi(this);
+	ui->groupBox->hide();
     ui->widget->setLayout(new QVBoxLayout());
-    setPersonne(_personne);
+	setPersonne(_personne);
+	_dbManager = static_cast<CoachApplication *>(QApplication::instance())->dbManager();
 }
 
 FormEditPersonne::~FormEditPersonne()
@@ -18,6 +24,7 @@ FormEditPersonne::~FormEditPersonne()
 
 void FormEditPersonne::setPersonne(Personne &personne)
 {
+	_edtPrenoms.clear();
     _personne = personne;
     ui->edtNom->setText(personne.nom());
     _edtPrenoms << new QLineEdit();
@@ -72,3 +79,15 @@ Personne &FormEditPersonne::personne() const
 {
     return _personne;
 }
+
+void FormEditPersonne::on_btnChangePasswd_clicked()
+{
+	_dbManager->changePassword(_personne.id(), ui->edtPasswd->text());
+}
+
+
+void FormEditPersonne::on_pushButton_clicked()
+{
+	ui->groupBox->setHidden(!ui->groupBox->isHidden());
+}
+

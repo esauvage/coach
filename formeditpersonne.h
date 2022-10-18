@@ -10,6 +10,8 @@ namespace Ui {
 class FormEditPersonne;
 }
 
+class DbManager;
+
 class FormEditPersonne : public QWidget
 {
     Q_OBJECT
@@ -30,10 +32,15 @@ private slots:
 
     void on_edtDeces_editingFinished();
 
+	void on_btnChangePasswd_clicked();
+
+	void on_pushButton_clicked();
+
 private:
     Ui::FormEditPersonne *ui;
     Personne & _personne;
     QList <QLineEdit *>_edtPrenoms;
+	DbManager * _dbManager;
 };
 
 #endif // FORMEDITPERSONNE_H

@@ -5,8 +5,11 @@
 CoachApplication::CoachApplication(int &argc, char **argv)
     :QApplication(argc, argv)
 {
-    _dbManager = new DbManager("G:/EtienneArea/Personnel/Coach/coach.db");
-//	_dbManager = new DbManager("C:/Users/etien/Documents/Coach/coach.db");
+	QCoreApplication::setOrganizationName("Sauvage");
+	QCoreApplication::setOrganizationDomain("les-sauvages.fr");
+	QCoreApplication::setApplicationName("Personnal coach");
+//    _dbManager = new DbManager("G:/EtienneArea/Personnel/Coach/coach.db");
+	_dbManager = new DbManager("coach.db");
 }
 
 DbManager *CoachApplication::dbManager() const

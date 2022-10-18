@@ -2,15 +2,19 @@
 #include "ui_coachmainwindow.h"
 
 #include "formeditpersonne.h"
-#include "formgestionpersonnes.h"
-#include "formgestionseances.h"
+
+#include <QGridLayout>
 
 CoachMainWindow::CoachMainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::CoachMainWindow)
+	, ui(new Ui::CoachMainWindow)
+	, _formEditPersonne(nullptr)
 {
     ui->setupUi(this);
-    _accueil = ui->centralwidget;
+	connect(ui->login, SIGNAL(curUserChanged()),
+			this, SLOT(onCurUserChanged()));
+	connect(ui->login, SIGNAL(editPersonneRequested(Personne &)),
+			this, SLOT(onEditPersonneRequested(Personne &)));
 }
 
 CoachMainWindow::~CoachMainWindow()
@@ -18,15 +22,22 @@ CoachMainWindow::~CoachMainWindow()
     delete ui;
 }
 
-
-void CoachMainWindow::on_btnPersonnes_clicked()
+void CoachMainWindow::onEditPersonneRequested(Personne & p)
 {
-    FormGestionPersonnes * gestionPers = new FormGestionPersonnes();
-    setCentralWidget(gestionPers);
+	if (!_formEditPersonne)
+	{
+		_formEditPersonne = new FormEditPersonne(p);
+		QGridLayout * l = dynamic_cast<QGridLayout *>(centralWidget()->layout());
+		l->addWidget(_formEditPersonne, 1, 0);
+	}
+	else
+	{
+		_formEditPersonne->setPersonne(p);
+	}
 }
 
-void CoachMainWindow::on_btnSeance_clicked()
+void CoachMainWindow::onCurUserChanged()
 {
-    FormGestionSeances * gestionSeance = new FormGestionSeances();
-    setCentralWidget(gestionSeance);
+	delete _formEditPersonne;
+	_formEditPersonne = nullptr;
 }

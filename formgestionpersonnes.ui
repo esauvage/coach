@@ -13,14 +13,17 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
     <widget class="QComboBox" name="comboBox"/>
    </item>
    <item>
-    <widget class="QPushButton" name="btnAjout">
+    <widget class="QLineEdit" name="edtPassword"/>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnEdit">
      <property name="text">
-      <string>Ajouter une personne</string>
+      <string>Éditer</string>
      </property>
     </widget>
    </item>

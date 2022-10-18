@@ -1,6 +1,7 @@
 #include "personne.h"
 
 Personne::Personne()
+	:_id(-1)
 {
 
 }

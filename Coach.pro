@@ -12,31 +12,23 @@ SOURCES += \
     coachapplication.cpp \
     dbmanager.cpp \
     formeditpersonne.cpp \
-    formeditseance.cpp \
     formgestionpersonnes.cpp \
-    formgestionseances.cpp \
     main.cpp \
     coachmainwindow.cpp \
-    personne.cpp \
-    seance.cpp
+    personne.cpp
 
 HEADERS += \
     coachapplication.h \
     coachmainwindow.h \
     dbmanager.h \
     formeditpersonne.h \
-    formeditseance.h \
     formgestionpersonnes.h \
-    formgestionseances.h \
-    personne.h \
-    seance.h
+    personne.h
 
 FORMS += \
     coachmainwindow.ui \
     formeditpersonne.ui \
-    formeditseance.ui \
-    formgestionpersonnes.ui \
-    formgestionseances.ui
+    formgestionpersonnes.ui
 
 TRANSLATIONS += \
     Coach_fr_FR.ts

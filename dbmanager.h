@@ -5,22 +5,16 @@
 #include <QSqlDatabase>
 
 #include "personne.h"
-#include "seance.h"
 
 class DbManager
 {
 public:
     DbManager(const QString& path);
-    QList<Personne> getPersonnes() const;
+	QList<QPair <QString, int> > getNomPersonnes() const;
     void addPersonne(const Personne & v) const;
     void modifPersonne(const Personne & v) const;
-    void supprimePersonne(const Personne & v) const;
-    Personne getPersonne(const int id) const;
-    QList<Seance> getSeances() const;
-    void addSeance(const Seance & v) const;
-    void modifSeance(const Seance & v) const;
-    void supprimeSeance(const Seance & v) const;
-    Seance getSeance(const int id) const;
+	void changePassword(int personneId, const QString& nPasswd) const;
+	Personne getPersonne(const int id, const QString &password) const;
 private:
     QSqlDatabase m_db;
 };
