@@ -6,6 +6,11 @@ Personne::Personne()
 
 }
 
+bool Personne::isValid()
+{
+	return _id > 0;
+}
+
 QString Personne::nom() const
 {
     return _nom;

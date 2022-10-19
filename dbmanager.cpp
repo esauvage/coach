@@ -4,14 +4,17 @@
 #include <QSqlError>
 #include <QDebug>
 
-/*CREATE TABLE PERSONNES (
-	"ID"	INTEGER NOT NULL,
-	"NOM"	TEXT NOT NULL,
-	"PERE_BIO"	 INTEGER,
-	"MERE_BIO"	 INTEGER,
-	"DATE_NAISSANCE" DATETIME,
-	"DATE_DECES" DATETIME,
-	PRIMARY KEY ("ID" AUTOINCREMENT)
+/*
+CREATE TABLE PERSONNES (
+	ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, NOM TEXT NOT NULL, PERE_BIO INTEGER, MERE_BIO INTEGER, DATE_NAISSANCE DATETIME, DATE_DECES DATETIME, PASSWORD TEXT);
+;
+CREATE TABLE SEANCES (
+	"ID"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	"DATE"	DATE NOT NULL,
+	"DEBUT"	 TIME NOT NULL,
+	"FIN"	 TIME NOT NULL,
+	"PERSONNE_ID" INTEGER NOT NULL,
+	FOREIGN KEY ("PERSONNE_ID") REFERENCES "PERSONNES"("ID")
 );
 */
 DbManager::DbManager(const QString& path)
@@ -65,8 +68,11 @@ void DbManager::modifPersonne(const Personne &v) const
     update.bindValue(":id", v.id());
     qDebug() << update.lastQuery();
     update.exec();
-    qDebug() << update.executedQuery();
-    qDebug() << update.lastError();
+	if (update.lastError().type() != QSqlError::NoError)
+	{
+		qDebug() << update.executedQuery();
+		qDebug() << update.lastError();
+	}
 }
 
 void DbManager::changePassword(int personneId, const QString& nPasswd) const
@@ -77,8 +83,11 @@ void DbManager::changePassword(int personneId, const QString& nPasswd) const
 	update.bindValue(":id", personneId);
 	qDebug() << update.lastQuery();
 	update.exec();
-	qDebug() << update.executedQuery();
-	qDebug() << update.lastError();
+	if (update.lastError().type() != QSqlError::NoError)
+	{
+		qDebug() << update.executedQuery();
+		qDebug() << update.lastError();
+	}
 }
 
 Personne DbManager::getPersonne(const int id, const QString &password) const
@@ -102,4 +111,202 @@ Personne DbManager::getPersonne(const int id, const QString &password) const
         r.setDateDeces(query.value(3).toDateTime());
     }
     return r;
+}
+
+void DbManager::supprimePersonne(int id) const
+{
+	QSqlQuery suppr;
+	suppr.prepare("DELETE FROM PERSONNES WHERE ID = :id");
+	suppr.bindValue(":id", id);
+	suppr.exec();
+	if (suppr.lastError().type() != QSqlError::NoError)
+	{
+		qDebug() << suppr.lastQuery();
+		qDebug() << suppr.lastError();
+	}
+}
+
+QList<Seance> DbManager::getSeances() const
+{
+	QList <Seance> r;
+	QSqlQuery query("SELECT ID, DATE, DEBUT, FIN, PERSONNE_ID FROM PERSONNES");
+	while (query.next()) {
+		Seance p;
+		p.setId(query.value(0).toInt());
+		p.setDate(query.value(1).toDate());
+		p.setDebut(query.value(2).toTime());
+		p.setFin(query.value(3).toTime());
+		r << p;
+	}
+	return r;
+}
+
+void DbManager::addSeance(const Seance &v) const
+{
+	QSqlQuery insert;
+	insert.prepare("INSERT INTO SEANCES (DATE, DEBUT, FIN, PERSONNE_ID) VALUES (:date, :debut, :fin, :personneId)");
+	insert.bindValue(":date", v.date());
+	insert.bindValue(":debut", v.debut());
+	insert.bindValue(":fin", v.fin());
+	insert.bindValue(":personneId", v.personne()->id());
+	qDebug() << insert.lastQuery();
+	insert.exec();
+	qDebug() << insert.executedQuery();
+	qDebug() << insert.lastError();
+}
+
+void DbManager::modifSeance(const Seance &v) const
+{
+	QSqlQuery update;
+	update.prepare("UPDATE SEANCES SET DATE = :date, DEBUT = :debut, FIN = :deces WHERE ID = :id");
+	update.bindValue(":date", v.date());
+	update.bindValue(":debut", v.debut());
+	update.bindValue(":fin", v.fin());
+	update.bindValue(":id", v.id());
+	qDebug() << update.lastQuery();
+	update.exec();
+	qDebug() << update.executedQuery();
+	qDebug() << update.lastError();
+}
+
+void DbManager::supprimeSeance(const Seance &v) const
+{
+	QSqlQuery update;
+	update.prepare("DELETE FROM SEANCES WHERE DATE = :date AND DEBUT = :debut AND FIN = :fin AND ID = :id");
+	update.bindValue(":date", v.date());
+	update.bindValue(":debut", v.debut());
+	update.bindValue(":fin", v.fin());
+	update.bindValue(":id", v.id());
+	qDebug() << update.lastQuery();
+	update.exec();
+	qDebug() << update.executedQuery();
+	qDebug() << update.lastError();
+}
+
+Seance DbManager::getSeance(const int id) const
+{
+	Seance r;
+	QSqlQuery query;
+	query.prepare("SELECT ID, DATE, DEBUT, FIN FROM SEANCES WHERE ID = :id");
+	query.bindValue(":id", id);
+	query.exec();
+	if (query.next()) {
+		r.setId(query.value(0).toInt());
+		r.setDate(query.value(1).toDate());
+		r.setDebut(query.value(2).toTime());
+		r.setFin(query.value(3).toTime());
+	}
+	return r;
+}
+
+QList<QPair<int, QString> > DbManager::getTodos(int personneId) const
+{
+	QList<QPair<int, QString> > r;
+	QSqlQuery query;
+	query.prepare("SELECT ID, NOM FROM TODO WHERE PERSONNE_ID = :id");
+	query.bindValue(":id", personneId);
+	query.exec();
+	while (query.next()) {
+		QPair<int, QString>v;
+		v.first = query.value(0).toInt();
+		v.second = query.value(1).toString();
+		r << v;
+	}
+	return r;
+}
+
+void DbManager::modifTodo(int id, const QString &nom) const
+{
+	QSqlQuery update;
+	update.prepare("UPDATE TODO SET NOM = :nom WHERE ID = :id");
+	update.bindValue(":nom", nom);
+	update.bindValue(":id", id);
+	qDebug() << update.lastQuery();
+	update.exec();
+	qDebug() << update.executedQuery();
+	qDebug() << update.lastError();
+}
+
+int DbManager::addTodo(const QString &nom, int personneId) const
+{
+	QSqlQuery insert;
+	insert.prepare("INSERT INTO TODO (PERSONNE_ID, NOM) VALUES (:personneId, :nom)");
+	insert.bindValue(":nom", nom);
+	insert.bindValue(":personneId", personneId);
+	qDebug() << insert.lastQuery();
+	insert.exec();
+	if (insert.lastError().type() != QSqlError::NoError)
+	{
+		qDebug() << insert.executedQuery();
+		qDebug() << insert.lastError();
+	}
+	insert.prepare("SELECT LAST_INSERT_ROWID();");
+	insert.exec();
+	if (insert.next()) {
+		return insert.value(0).toInt();
+	}
+	return -1;
+}
+
+void DbManager::supprimeTodo(int id) const
+{
+	QSqlQuery suppr;
+	suppr.prepare("DELETE FROM TODO WHERE ID = :id");
+	suppr.bindValue(":id", id);
+	suppr.exec();
+	if (suppr.lastError().type() != QSqlError::NoError)
+	{
+		qDebug() << suppr.lastError();
+	}
+}
+
+int DbManager::addDone(const QString &nom, const QDateTime &date, int personneId) const
+{
+	QSqlQuery insert;
+	insert.prepare("INSERT INTO DONE (PERSONNE_ID, NOM, DATE) VALUES (:personneId, :nom, :date)");
+	insert.bindValue(":nom", nom);
+	insert.bindValue(":date", date);
+	insert.bindValue(":personneId", personneId);
+	qDebug() << insert.lastQuery();
+	insert.exec();
+	if (insert.lastError().type() != QSqlError::NoError)
+	{
+		qDebug() << insert.executedQuery();
+		qDebug() << insert.lastError();
+	}
+	insert.prepare("SELECT LAST_INSERT_ROWID();");
+	insert.exec();
+	if (insert.next()) {
+		return insert.value(0).toInt();
+	}
+	return -1;
+}
+
+void DbManager::supprimeDone(int id) const
+{
+	QSqlQuery suppr;
+	suppr.prepare("DELETE FROM DONE WHERE ID = :id");
+	suppr.bindValue(":id", id);
+	suppr.exec();
+	if (suppr.lastError().type() != QSqlError::NoError)
+	{
+		qDebug() << suppr.lastError();
+	}
+}
+
+QList<DoneTask> DbManager::getDones(int personneId) const
+{
+	QList<DoneTask> r;
+	QSqlQuery query;
+	query.prepare("SELECT ID, NOM, DATE FROM DONE WHERE PERSONNE_ID = :id");
+	query.bindValue(":id", personneId);
+	query.exec();
+	while (query.next()) {
+		DoneTask v;
+		v.id = query.value(0).toInt();
+		v.nom = query.value(1).toString();
+		v.date = query.value(2).toDateTime();
+		r << v;
+	}
+	return r;
 }

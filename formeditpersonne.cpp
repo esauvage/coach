@@ -85,8 +85,26 @@ void FormEditPersonne::on_btnChangePasswd_clicked()
 	_dbManager->changePassword(_personne.id(), ui->edtPasswd->text());
 }
 
+void FormEditPersonne::on_btnChangePerson_clicked()
+{
+	if (!_personne.isValid()) _dbManager->addPersonne(_personne);
+	else _dbManager->modifPersonne(_personne);
+	emit finished();
+}
 
-void FormEditPersonne::on_pushButton_clicked()
+void FormEditPersonne::on_pushButton_2_clicked()
+{
+	emit finished();
+}
+
+void FormEditPersonne::on_btnSuppr_clicked()
+{
+	if (_personne.isValid()) _dbManager->supprimePersonne(_personne.id());
+	emit finished();
+}
+
+
+void FormEditPersonne::on_btnAnnuler_clicked()
 {
 	ui->groupBox->setHidden(!ui->groupBox->isHidden());
 }

@@ -12,23 +12,40 @@ SOURCES += \
     coachapplication.cpp \
     dbmanager.cpp \
     formeditpersonne.cpp \
+    formeditseance.cpp \
     formgestionpersonnes.cpp \
+    formgestionseances.cpp \
+    formgestiontodo.cpp \
     main.cpp \
     coachmainwindow.cpp \
-    personne.cpp
+    personne.cpp \
+    seance.cpp \
+    taskdelegate.cpp \
+    treemodel.cpp \
+    treetask.cpp
 
 HEADERS += \
     coachapplication.h \
     coachmainwindow.h \
     dbmanager.h \
     formeditpersonne.h \
+    formeditseance.h \
     formgestionpersonnes.h \
-    personne.h
+    formgestionseances.h \
+    formgestiontodo.h \
+    personne.h \
+    seance.h \
+    taskdelegate.h \
+    treemodel.h \
+    treetask.h
 
 FORMS += \
     coachmainwindow.ui \
     formeditpersonne.ui \
-    formgestionpersonnes.ui
+    formeditseance.ui \
+    formgestionpersonnes.ui \
+    formgestionseances.ui \
+    formgestiontodo.ui
 
 TRANSLATIONS += \
     Coach_fr_FR.ts

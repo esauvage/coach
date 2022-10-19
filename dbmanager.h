@@ -5,6 +5,14 @@
 #include <QSqlDatabase>
 
 #include "personne.h"
+#include "seance.h"
+
+struct DoneTask
+{
+	QString nom;
+	QDateTime date;
+	int id;
+};
 
 class DbManager
 {
@@ -15,6 +23,19 @@ public:
     void modifPersonne(const Personne & v) const;
 	void changePassword(int personneId, const QString& nPasswd) const;
 	Personne getPersonne(const int id, const QString &password) const;
+	void supprimePersonne(int id) const;
+	QList<Seance> getSeances() const;
+	void addSeance(const Seance &v) const;
+	void modifSeance(const Seance &v) const;
+	void supprimeSeance(const Seance &v) const;
+	Seance getSeance(const int id) const;
+	QList<QPair<int, QString> > getTodos(int personneId) const;
+	void modifTodo(int id, const QString &nom) const;
+	int addTodo(const QString &nom, int personneId) const;
+	void supprimeTodo(int id) const;
+	int addDone(const QString &nom, const QDateTime &date, int personneId) const;
+	void supprimeDone(int id) const;
+	QList<DoneTask> getDones(int personneId) const;
 private:
     QSqlDatabase m_db;
 };

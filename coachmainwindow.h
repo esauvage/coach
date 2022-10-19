@@ -5,6 +5,7 @@
 
 class Personne;
 class FormEditPersonne;
+class FormGestionTodo;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class CoachMainWindow; }
@@ -21,9 +22,11 @@ public:
 private slots:
 	void onEditPersonneRequested(Personne & p);
 	void onCurUserChanged();
+	void onEditPersonFinished();
 
 private:
     Ui::CoachMainWindow *ui;
 	FormEditPersonne *_formEditPersonne;
+	FormGestionTodo * _formGestTodo;
 };
 #endif // COACHMAINWINDOW_H

@@ -8,6 +8,7 @@ class Personne
 {
 public:
     Personne();
+	bool isValid();
     QString nom() const;
     void setNom(const QString &nom);
 

@@ -18,6 +18,13 @@
     <widget class="QComboBox" name="comboBox"/>
    </item>
    <item>
+    <widget class="QLabel" name="lblPasswd">
+     <property name="text">
+      <string>Mot de passe :</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QLineEdit" name="edtPassword"/>
    </item>
    <item>
