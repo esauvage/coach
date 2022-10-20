@@ -53,6 +53,7 @@
 
 #include <QVariant>
 #include <QVector>
+#include <QDateTime>
 
 //! [0]
 class TreeTask
@@ -72,11 +73,23 @@ public:
     bool removeColumns(int position, int columns);
     int childNumber() const;
 	bool setData(int column, const QVariant &value, int role = Qt::EditRole);
+	bool setId(int v);
+	int id() const;
+	bool setNom(const QString &v);
+	QString nom() const;
+	bool setDate(const QDateTime &d);
+	QDateTime date() const;
+	const QString &recurrence() const;
+	void setRecurrence(const QString &newRecurrence);
 
 private:
 	QVector<TreeTask*> childItems;
 	QHash<int, QVector<QVariant> > itemData;
 	TreeTask *parentItem;
+	QString _nom;
+	QString _recurrence;
+	QDateTime _date;
+	int _id;
 };
 //! [0]
 
