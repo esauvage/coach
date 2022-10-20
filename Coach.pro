@@ -21,6 +21,7 @@ SOURCES += \
     personne.cpp \
     seance.cpp \
     taskdelegate.cpp \
+    taskdonedelegate.cpp \
     treemodel.cpp \
     treetask.cpp
 
@@ -36,6 +37,7 @@ HEADERS += \
     personne.h \
     seance.h \
     taskdelegate.h \
+    taskdonedelegate.h \
     treemodel.h \
     treetask.h
 

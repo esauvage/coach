@@ -8,9 +8,8 @@
 #include "treetask.h"
 
 //! [0]
-TreeTask::TreeTask(const QHash<int, QVector<QVariant> >&data, TreeTask *parent)
-	: itemData(data),
-	  parentItem(parent)
+TreeTask::TreeTask(TreeTask *parent)
+    :parentItem(parent)
 {}
 //! [0]
 
@@ -49,29 +48,32 @@ int TreeTask::childNumber() const
 //! [5]
 int TreeTask::columnCount() const
 {
-	return itemData.count();
+    return 3;
 }
 //! [5]
 
 //! [6]
 QVariant TreeTask::data(int column, int role) const
 {
+    if (column > columnCount()) return QVariant();
 	switch (role)
 	{
 	case Qt::EditRole:
 	case Qt::DisplayRole:
-		return _nom;
+        switch (column)
+        {
+        case 0:
+            return _nom;
+        case 1:
+            return _recurrence;
+        case 2:
+            return _date;
+        }
 	case Qt::CheckStateRole:
-		return _date.isValid();
+        return column ? QVariant() : (_date.isValid() ? Qt::Checked : Qt::Unchecked);
 	default:
 		return QVariant();
 	}
-
-	if (column < 0 || column >= itemData[Qt::EditRole].size())
-		return QVariant();
-	if (!itemData.keys().contains(role))
-		return QVariant();
-	return itemData[role].at(column);
 }
 //! [6]
 
@@ -83,13 +85,9 @@ bool TreeTask::insertChildren(int position, int count, int columns)
 		return false;
 
 	for (int row = 0; row < count; ++row) {
-		QHash<int, QVector<QVariant> > data;
-		data[Qt::CheckStateRole] << QVariant();
-		data[Qt::EditRole] << QVariant();
-		TreeTask *item = new TreeTask(data, this);
+        TreeTask *item = new TreeTask(this);
 		childItems.insert(position, item);
 	}
-
 	return true;
 }
 //! [7]
@@ -97,18 +95,13 @@ bool TreeTask::insertChildren(int position, int count, int columns)
 //! [8]
 bool TreeTask::insertColumns(int position, int columns)
 {
-	if (position < 0 || position > itemData[Qt::EditRole].size())
-		return false;
+    if (position < 0 || position > columnCount())
+        return false;
 
-	for (int column = 0; column < columns; ++column)
-	{
-		itemData[Qt::EditRole].insert(position, QVariant());
-		itemData[Qt::CheckStateRole].insert(position, QVariant());
-	}
-	for (TreeTask *child : qAsConst(childItems))
-		child->insertColumns(position, columns);
+    for (TreeTask *child : qAsConst(childItems))
+        child->insertColumns(position, columns);
 
-	return true;
+    return true;
 }
 //! [8]
 
@@ -134,18 +127,13 @@ bool TreeTask::removeChildren(int position, int count)
 
 bool TreeTask::removeColumns(int position, int columns)
 {
-	if (position < 0 || position + columns > itemData[Qt::EditRole].size())
-		return false;
+    if (position < 0 || position + columns > columnCount())
+        return false;
 
-	for (int column = 0; column < columns; ++column)
-	{
-		itemData[Qt::EditRole].remove(position);
-		itemData[Qt::CheckStateRole].remove(position);
-	}
-	for (TreeTask *child : qAsConst(childItems))
-		child->removeColumns(position, columns);
+    for (TreeTask *child : qAsConst(childItems))
+        child->removeColumns(position, columns);
 
-	return true;
+    return true;
 }
 
 //! [11]
@@ -155,19 +143,20 @@ bool TreeTask::setData(int column, const QVariant &value, int role)
 	{
 	case Qt::EditRole:
 	case Qt::DisplayRole:
-		setNom(value.toString());
+        switch (column)
+        {
+        case 0 : setNom(value.toString()); break;
+        case 1: setRecurrence(value.toString()); break;
+        case 2: setDate(value.toDateTime()); break;
+        }
 		break;
 	case Qt::CheckStateRole:
+        if (column) return false;
 		setDate(value.toInt() == Qt::Checked ? QDateTime::currentDateTime() : QDateTime());
 		break;
 	default:
 		return false;
 	}
-	return true;
-	if (column < 0 || column >= itemData[role].size())
-		return false;
-
-	itemData[role][column] = value;
 	return true;
 }
 //! [11]

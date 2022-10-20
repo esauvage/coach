@@ -57,14 +57,7 @@
 TreeModel::TreeModel(const QStringList &headers, const QString &data, QObject *parent)
     : QAbstractItemModel(parent)
 {
-	QHash<int, QVector<QVariant> > rootData;
-    for (const QString &header : headers)
-	{
-		rootData[Qt::EditRole] << header;
-		rootData[Qt::CheckStateRole] << QVariant();
-	}
-	rootItem = new TreeTask(rootData);
-    setupModelData(data.split('\n'), rootItem);
+    rootItem = new TreeTask();
 }
 //! [0]
 
@@ -92,7 +85,6 @@ QVariant TreeModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
 	TreeTask *item = getItem(index);
-	if (role == Qt::DisplayRole) role = Qt::EditRole;
 	return item->data(index.column(), role);
 }
 
@@ -102,7 +94,13 @@ Qt::ItemFlags TreeModel::flags(const QModelIndex &index) const
     if (!index.isValid())
         return Qt::NoItemFlags;
 
-	return Qt::ItemIsUserCheckable | Qt::ItemIsEditable | QAbstractItemModel::flags(index);
+    if (index.column())
+    {
+        return Qt::ItemIsEditable | QAbstractItemModel::flags(index);
+    }
+    else {
+        return Qt::ItemIsUserCheckable | Qt::ItemIsEditable | QAbstractItemModel::flags(index);
+    }
 }
 //! [3]
 
@@ -131,13 +129,17 @@ QVariant TreeModel::headerData(int section, Qt::Orientation orientation,
 QModelIndex TreeModel::index(int row, int column, const QModelIndex &parent) const
 {
     if (parent.isValid() && parent.column() != 0)
+    {
         return QModelIndex();
+    }
 //! [5]
 
 //! [6]
 	TreeTask *parentItem = getItem(parent);
     if (!parentItem)
+    {
         return QModelIndex();
+    }
 
 	TreeTask *childItem = parentItem->child(row);
     if (childItem)
@@ -174,7 +176,9 @@ bool TreeModel::insertRows(int position, int rows, const QModelIndex &parent)
 QModelIndex TreeModel::parent(const QModelIndex &index) const
 {
     if (!index.isValid())
+    {
         return QModelIndex();
+    }
 
 	TreeTask *childItem = getItem(index);
 	TreeTask *parentItem = childItem ? childItem->parent() : nullptr;
@@ -200,6 +204,7 @@ bool TreeModel::removeColumns(int position, int columns, const QModelIndex &pare
 
 bool TreeModel::removeRows(int position, int rows, const QModelIndex &parent)
 {
+    if (!rows) return true;
 	TreeTask *parentItem = getItem(parent);
     if (!parentItem)
         return false;
@@ -229,7 +234,7 @@ bool TreeModel::setData(const QModelIndex &index, const QVariant &value, int rol
 	bool result = item->setData(index.column(), value, role);
 
     if (result)
-        emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole});
+        emit dataChanged(index, index, {Qt::DisplayRole, role});
 
     return result;
 }

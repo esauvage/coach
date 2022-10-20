@@ -7,3 +7,8 @@ TaskDelegate::TaskDelegate(QObject *parent)
 {
 
 }
+
+bool TaskDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)
+{
+    return QStyledItemDelegate::editorEvent(event, model, option, index);
+}

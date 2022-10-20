@@ -7,6 +7,7 @@
 #include <QFile>
 #include "treemodel.h"
 #include "taskdelegate.h"
+#include "taskdonedelegate.h"
 
 FormGestionTodo::FormGestionTodo(QWidget *parent) :
 	QWidget(parent),
@@ -23,9 +24,15 @@ FormGestionTodo::FormGestionTodo(QWidget *parent) :
 
 	TreeModel *model = new TreeModel(headers, "");
 	ui->treeTodo->setModel(model);
+    ui->treeDone->setModel(model);
 
 	TaskDelegate *delegate = new TaskDelegate();
 	ui->treeTodo->setItemDelegate(delegate);
+    connect(ui->treeTodo->itemDelegate(), SIGNAL(commitData(QWidget*)),
+            this, SLOT(onCommitData(QWidget*)));
+    TaskDoneDelegate *taskDoneDelegate = new TaskDoneDelegate();
+    ui->treeDone->setItemDelegate(taskDoneDelegate);
+    ui->treeDone->hideColumn(1);
 }
 
 FormGestionTodo::~FormGestionTodo()
@@ -35,7 +42,6 @@ FormGestionTodo::~FormGestionTodo()
 
 void FormGestionTodo::setTodos(const QList<QPair<int, QString> > &todos)
 {
-	const QModelIndex index = ui->treeTodo->selectionModel()->currentIndex();
 	QAbstractItemModel *model = ui->treeTodo->model();
 	model->removeRows(0, model->rowCount());
 	ui->lstTodo->clear();
@@ -46,8 +52,8 @@ void FormGestionTodo::setTodos(const QList<QPair<int, QString> > &todos)
 		todo->setFlags(Qt::ItemIsEditable|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
 		todo->setCheckState(Qt::Unchecked);
 		ui->lstTodo->addItem(todo);
-		model->insertRow(0, index);
-		const QModelIndex child = model->index(0, 0, index);
+        model->insertRow(0);
+        const QModelIndex child = model->index(0, 0);
 		model->setData(child, s.second, Qt::EditRole);
 		model->setData(child, Qt::Unchecked, Qt::CheckStateRole);
 	}
@@ -85,17 +91,18 @@ void FormGestionTodo::on_btnAjout_clicked()
 	ui->lstTodo->setEditTriggers(ui->lstTodo->editTriggers()|QAbstractItemView::CurrentChanged);
 	ui->lstTodo->setCurrentItem(todo);
 	ui->lstTodo->setEditTriggers(ui->lstTodo->editTriggers()&~QAbstractItemView::CurrentChanged);
-	const QModelIndex index = ui->treeTodo->selectionModel()->currentIndex();
 	QAbstractItemModel *model = ui->treeTodo->model();
-	model->insertRow(0, index);
-	const QModelIndex child = model->index(0, 0, index);
-	model->setData(child, "", Qt::EditRole);
-	model->setData(child, Qt::Unchecked, Qt::CheckStateRole);
+    model->insertRow(0);
 }
 
 void FormGestionTodo::onCommitData( QWidget* editor )
 {
 	Q_UNUSED(editor);
+    TaskDelegate * s = dynamic_cast<TaskDelegate *>(sender());
+    if (s)
+    {
+        return;
+    }
 	for (auto &s : ui->lstTodo->findItems("", Qt::MatchContains))
 	{
 		if (s->data(Qt::UserRole).toInt()>0) _dbManager->modifTodo(s->data(Qt::UserRole).toInt(),
@@ -147,10 +154,9 @@ void FormGestionTodo::on_lstDone_itemChanged(QListWidgetItem *item)
 	ui->lstTodo->addItem(item);
 	item->setData(Qt::UserRole, _dbManager->addTodo(item->text(),
 						_personneId));
-	const QModelIndex index = ui->treeTodo->selectionModel()->currentIndex();
 	QAbstractItemModel *model = ui->treeTodo->model();
-	model->insertRow(0, index);
-	const QModelIndex child = model->index(0, 0, index);
+    model->insertRow(0);
+    const QModelIndex child = model->index(0, 0);
 	model->setData(child, item->text(), Qt::EditRole);
 	model->setData(child, Qt::Unchecked, Qt::CheckStateRole);
 }

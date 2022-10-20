@@ -59,7 +59,7 @@
 class TreeTask
 {
 public:
-	explicit TreeTask(const QHash<int, QVector<QVariant> > &data, TreeTask *parent = nullptr);
+    explicit TreeTask(TreeTask *parent = nullptr);
 	~TreeTask();
 
 	TreeTask *child(int number);
@@ -84,7 +84,6 @@ public:
 
 private:
 	QVector<TreeTask*> childItems;
-	QHash<int, QVector<QVariant> > itemData;
 	TreeTask *parentItem;
 	QString _nom;
 	QString _recurrence;

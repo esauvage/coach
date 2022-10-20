@@ -3,8 +3,6 @@
 
 #include "formeditpersonne.h"
 #include "formgestiontodo.h"
-#include "coachapplication.h"
-#include "dbmanager.h"
 
 #include <QGridLayout>
 
