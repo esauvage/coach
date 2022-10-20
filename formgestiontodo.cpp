@@ -23,8 +23,6 @@ FormGestionTodo::FormGestionTodo(QWidget *parent) :
 
 	TreeModel *model = new TreeModel(headers, "");
 	ui->treeTodo->setModel(model);
-	for (int column = 0; column < model->columnCount(); ++column)
-		ui->treeTodo->resizeColumnToContents(column);
 
 	TaskDelegate *delegate = new TaskDelegate();
 	ui->treeTodo->setItemDelegate(delegate);
@@ -53,6 +51,8 @@ void FormGestionTodo::setTodos(const QList<QPair<int, QString> > &todos)
 		model->setData(child, s.second, Qt::EditRole);
 		model->setData(child, Qt::Unchecked, Qt::CheckStateRole);
 	}
+	for (int column = 0; column < model->columnCount(); ++column)
+		ui->treeTodo->resizeColumnToContents(column);
 }
 
 void FormGestionTodo::setDones(const QList<DoneTask> &dones)
