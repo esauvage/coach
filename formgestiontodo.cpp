@@ -4,7 +4,8 @@
 #include "coachapplication.h"
 #include "dbmanager.h"
 
-#include <QFile>
+#include <QSortFilterProxyModel>
+
 #include "treemodel.h"
 #include "taskdelegate.h"
 #include "taskdonedelegate.h"
@@ -23,8 +24,19 @@ FormGestionTodo::FormGestionTodo(QWidget *parent) :
 	const QStringList headers({tr("Description")});
 
 	TreeModel *model = new TreeModel(headers, "");
-	ui->treeTodo->setModel(model);
-    ui->treeDone->setModel(model);
+	const auto regExp = QRegularExpression("^$");
+
+	auto proxyModel = new QSortFilterProxyModel(this);
+	proxyModel->setSourceModel(model);
+	proxyModel->setFilterRegularExpression(regExp);
+	proxyModel->setFilterKeyColumn(2);
+	ui->treeTodo->setModel(proxyModel);
+	const auto regExpDone = QRegularExpression(".+");
+	auto proxyDoneModel = new QSortFilterProxyModel(this);
+	proxyDoneModel->setSourceModel(model);
+	proxyDoneModel->setFilterRegularExpression(regExpDone);
+	proxyDoneModel->setFilterKeyColumn(2);
+	ui->treeDone->setModel(proxyDoneModel);
 
 	TaskDelegate *delegate = new TaskDelegate();
 	ui->treeTodo->setItemDelegate(delegate);
@@ -43,7 +55,7 @@ FormGestionTodo::~FormGestionTodo()
 void FormGestionTodo::setTodos(const QList<QPair<int, QString> > &todos)
 {
 	QAbstractItemModel *model = ui->treeTodo->model();
-	model->removeRows(0, model->rowCount());
+//	model->removeRows(0, model->rowCount());
 	ui->lstTodo->clear();
 	for (auto &s : todos)
 	{
@@ -58,11 +70,15 @@ void FormGestionTodo::setTodos(const QList<QPair<int, QString> > &todos)
 		model->setData(child, Qt::Unchecked, Qt::CheckStateRole);
 	}
 	for (int column = 0; column < model->columnCount(); ++column)
+	{
 		ui->treeTodo->resizeColumnToContents(column);
+		ui->treeDone->resizeColumnToContents(column);
+	}
 }
 
 void FormGestionTodo::setDones(const QList<DoneTask> &dones)
 {
+	QAbstractItemModel *model = ui->treeTodo->model();
 	ui->lstDone->clear();
 	for (auto &s : dones)
 	{
@@ -72,6 +88,11 @@ void FormGestionTodo::setDones(const QList<DoneTask> &dones)
 		done->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
 		done->setCheckState(Qt::Checked);
 		ui->lstDone->addItem(done);
+		model->insertRow(0);
+		QModelIndex child = model->index(0, 0);
+		model->setData(child, s.nom, Qt::EditRole);
+		child = model->index(0, 2);
+		model->setData(child, s.date, Qt::EditRole);
 	}
 }
 
