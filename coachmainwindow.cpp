@@ -49,6 +49,7 @@ void CoachMainWindow::onCurUserChanged()
 	delete _formEditPersonne;
 	_formEditPersonne = nullptr;
 	if (_formGestTodo) delete _formGestTodo;
+	_formGestTodo = nullptr;
 	if (ui->login->curPersonId() <= 0) return;
 	_formGestTodo = new FormGestionTodo();
 	QGridLayout * l = dynamic_cast<QGridLayout *>(centralWidget()->layout());

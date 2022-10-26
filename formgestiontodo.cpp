@@ -15,6 +15,7 @@ FormGestionTodo::FormGestionTodo(QWidget *parent) :
 	ui(new Ui::FormGestionTodo)
   , _dbManager(nullptr)
   , _personneId(-1)
+  , _initialized(false)
 {
 	ui->setupUi(this);
 	_dbManager = static_cast<CoachApplication *>(QApplication::instance())->dbManager();
@@ -37,6 +38,10 @@ FormGestionTodo::FormGestionTodo(QWidget *parent) :
 	proxyDoneModel->setFilterRegularExpression(regExpDone);
 	proxyDoneModel->setFilterKeyColumn(2);
 	ui->treeDone->setModel(proxyDoneModel);
+	connect(model, SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &, const QList<int> &)),
+			this, SLOT(onTodoChanged(const QModelIndex &, const QModelIndex &, const QList<int> &)));
+//	connect(proxyDoneModel, SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &, const QList<int> &)),
+//			this, SLOT(onTodoChanged(const QModelIndex &, const QModelIndex &, const QList<int> &)));
 
 	TaskDelegate *delegate = new TaskDelegate();
 	ui->treeTodo->setItemDelegate(delegate);
@@ -55,7 +60,7 @@ FormGestionTodo::~FormGestionTodo()
 void FormGestionTodo::setTodos(const QList<QPair<int, QString> > &todos)
 {
 	QAbstractItemModel *model = ui->treeTodo->model();
-//	model->removeRows(0, model->rowCount());
+	model->blockSignals(true);
 	ui->lstTodo->clear();
 	for (auto &s : todos)
 	{
@@ -69,16 +74,17 @@ void FormGestionTodo::setTodos(const QList<QPair<int, QString> > &todos)
 		model->setData(child, s.second, Qt::EditRole);
 		model->setData(child, Qt::Unchecked, Qt::CheckStateRole);
 	}
+	model->blockSignals(false);
 	for (int column = 0; column < model->columnCount(); ++column)
 	{
 		ui->treeTodo->resizeColumnToContents(column);
-		ui->treeDone->resizeColumnToContents(column);
 	}
 }
 
 void FormGestionTodo::setDones(const QList<DoneTask> &dones)
 {
 	QAbstractItemModel *model = ui->treeTodo->model();
+	model->blockSignals(true);
 	ui->lstDone->clear();
 	for (auto &s : dones)
 	{
@@ -93,6 +99,11 @@ void FormGestionTodo::setDones(const QList<DoneTask> &dones)
 		model->setData(child, s.nom, Qt::EditRole);
 		child = model->index(0, 2);
 		model->setData(child, s.date, Qt::EditRole);
+	}
+	model->blockSignals(false);
+	for (int column = 0; column < model->columnCount(); ++column)
+	{
+		ui->treeDone->resizeColumnToContents(column);
 	}
 }
 
@@ -137,11 +148,23 @@ void FormGestionTodo::onCommitData( QWidget* editor )
 
 void FormGestionTodo::populate()
 {
+	_initialized = false;
 	ui->lstTodo->clear();
+	QAbstractItemModel *model = ui->treeTodo->model();
+	if (model)
+	{
+		model->removeRows(0, model->rowCount());
+	}
+	model = ui->treeDone->model();
+	if (model)
+	{
+		model->removeRows(0, model->rowCount());
+	}
 	if (_personneId <= 0) return;
 	auto todos = _dbManager->getTodos(_personneId);
 	setTodos(todos);
 	setDones(_dbManager->getDones(_personneId));
+	_initialized = true;
 }
 
 void FormGestionTodo::on_lstTodo_itemChanged(QListWidgetItem *item)
@@ -180,4 +203,41 @@ void FormGestionTodo::on_lstDone_itemChanged(QListWidgetItem *item)
     const QModelIndex child = model->index(0, 0);
 	model->setData(child, item->text(), Qt::EditRole);
 	model->setData(child, Qt::Unchecked, Qt::CheckStateRole);
+}
+
+void FormGestionTodo::onTodoChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight,
+									const QList<int> &roles)
+{
+	Q_UNUSED(roles);
+	if (!_initialized) return;
+	auto index = topLeft;
+//	for(auto index = topLeft; index <= bottomRight; index = index.sibling(index.row()+1, 0))
+	{
+		if (index.data(Qt::CheckStateRole) == Qt::Unchecked)
+		{
+			_dbManager->supprimeDone(index.data(Qt::UserRole).toInt());
+			_dbManager->addTodo(index.data(Qt::EditRole).toString(),
+								_personneId);
+		}
+		else
+		{
+			_dbManager->supprimeTodo(index.data(Qt::UserRole).toInt());
+			_dbManager->addDone(index.data(Qt::EditRole).toString(),
+								index.siblingAtColumn(1).data(Qt::UserRole).toDateTime(),
+								_personneId);
+		}
+	}
+}
+
+void FormGestionTodo::onDoneChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
+{
+	for(auto index = topLeft; index < bottomRight; index = index.sibling(index.row()+1, 0))
+	{
+		if (index.data(Qt::CheckStateRole) == Qt::Unchecked)
+			continue;
+		_dbManager->supprimeDone(index.data(Qt::UserRole).toInt());
+		_dbManager->addTodo(index.data(Qt::EditRole).toString(),
+								_personneId);
+	}
+
 }

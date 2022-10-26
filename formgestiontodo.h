@@ -26,6 +26,8 @@ private slots:
 	void onCommitData(QWidget *editor);
 	void on_lstTodo_itemChanged(QListWidgetItem *item);
 	void on_lstDone_itemChanged(QListWidgetItem *item);
+	void onTodoChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles);
+	void onDoneChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
 
 private:
 	void setTodos(const QList<QPair<int, QString> >  &todos);
@@ -35,6 +37,7 @@ private:
 	Ui::FormGestionTodo *ui;
 	DbManager * _dbManager = nullptr;
 	int _personneId;
+	bool _initialized;
 };
 
 #endif // FORMGESTIONTODO_H
