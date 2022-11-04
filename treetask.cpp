@@ -69,9 +69,11 @@ QVariant TreeTask::data(int column, int role) const
         case 2:
             return _date;
         }
-	case Qt::CheckStateRole:
+    case Qt::CheckStateRole:
         return column ? QVariant() : (_date.isValid() ? Qt::Checked : Qt::Unchecked);
-	default:
+    case Qt::UserRole:
+        return _id;
+    default:
 		return QVariant();
 	}
 }
@@ -154,6 +156,9 @@ bool TreeTask::setData(int column, const QVariant &value, int role)
         if (column) return false;
 		setDate(value.toInt() == Qt::Checked ? QDateTime::currentDateTime() : QDateTime());
 		break;
+    case Qt::UserRole:
+        setId(value.toInt());
+        break;
 	default:
 		return false;
 	}

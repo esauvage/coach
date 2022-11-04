@@ -2,6 +2,7 @@
 #define FORMGESTIONTODO_H
 
 #include <QWidget>
+#include <QModelIndex>
 
 #include "dbmanager.h"
 
@@ -23,11 +24,7 @@ public:
 
 private slots:
 	void on_btnAjout_clicked();
-	void onCommitData(QWidget *editor);
-	void on_lstTodo_itemChanged(QListWidgetItem *item);
-	void on_lstDone_itemChanged(QListWidgetItem *item);
-	void onTodoChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles);
-	void onDoneChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
+    void onTodoChanged(QModelIndex topLeft, QModelIndex bottomRight, QList<int> roles);
 
 private:
 	void setTodos(const QList<QPair<int, QString> >  &todos);

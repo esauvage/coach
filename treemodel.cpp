@@ -54,7 +54,7 @@
 #include <QtWidgets>
 
 //! [0]
-TreeModel::TreeModel(const QStringList &headers, const QString &data, QObject *parent)
+TreeModel::TreeModel(const QStringList &headers, QObject *parent)
     : QAbstractItemModel(parent)
 {
     rootItem = new TreeTask();
@@ -79,11 +79,9 @@ int TreeModel::columnCount(const QModelIndex &parent) const
 QVariant TreeModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())
+    {
         return QVariant();
-
-	if (role != Qt::DisplayRole && role != Qt::EditRole && role != Qt::CheckStateRole)
-        return QVariant();
-
+    }
 	TreeTask *item = getItem(index);
 	return item->data(index.column(), role);
 }
@@ -227,7 +225,7 @@ int TreeModel::rowCount(const QModelIndex &parent) const
 
 bool TreeModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-	if (role != Qt::EditRole && role != Qt::CheckStateRole)
+    if (role != Qt::EditRole && role != Qt::CheckStateRole && role != Qt::UserRole)
         return false;
 
 	TreeTask *item = getItem(index);

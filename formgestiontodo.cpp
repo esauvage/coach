@@ -20,11 +20,9 @@ FormGestionTodo::FormGestionTodo(QWidget *parent) :
 	ui->setupUi(this);
 	_dbManager = static_cast<CoachApplication *>(QApplication::instance())->dbManager();
 	populate();
-	connect(ui->lstTodo->itemDelegate(), SIGNAL(commitData(QWidget*)),
-			this, SLOT(onCommitData(QWidget*)));
-	const QStringList headers({tr("Description")});
+    const QStringList headers({tr("Description"), tr(""), tr("Date")});
 
-	TreeModel *model = new TreeModel(headers, "");
+    TreeModel *model = new TreeModel(headers);
 	const auto regExp = QRegularExpression("^$");
 
 	auto proxyModel = new QSortFilterProxyModel(this);
@@ -38,10 +36,8 @@ FormGestionTodo::FormGestionTodo(QWidget *parent) :
 	proxyDoneModel->setFilterRegularExpression(regExpDone);
 	proxyDoneModel->setFilterKeyColumn(2);
 	ui->treeDone->setModel(proxyDoneModel);
-	connect(model, SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &, const QList<int> &)),
-			this, SLOT(onTodoChanged(const QModelIndex &, const QModelIndex &, const QList<int> &)));
-//	connect(proxyDoneModel, SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &, const QList<int> &)),
-//			this, SLOT(onTodoChanged(const QModelIndex &, const QModelIndex &, const QList<int> &)));
+    connect(model, SIGNAL(dataChanged(QModelIndex, QModelIndex, QList<int>)),
+            this, SLOT(onTodoChanged(QModelIndex, QModelIndex, QList<int>)));
 
 	TaskDelegate *delegate = new TaskDelegate();
 	ui->treeTodo->setItemDelegate(delegate);
@@ -61,18 +57,13 @@ void FormGestionTodo::setTodos(const QList<QPair<int, QString> > &todos)
 {
 	QAbstractItemModel *model = ui->treeTodo->model();
 	model->blockSignals(true);
-	ui->lstTodo->clear();
 	for (auto &s : todos)
 	{
-		QListWidgetItem * todo = new QListWidgetItem(s.second);
-		todo->setData(Qt::UserRole, s.first);
-		todo->setFlags(Qt::ItemIsEditable|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
-		todo->setCheckState(Qt::Unchecked);
-		ui->lstTodo->addItem(todo);
         model->insertRow(0);
         const QModelIndex child = model->index(0, 0);
-		model->setData(child, s.second, Qt::EditRole);
-		model->setData(child, Qt::Unchecked, Qt::CheckStateRole);
+        model->setData(child, s.first, Qt::UserRole);
+        model->setData(child, s.second, Qt::EditRole);
+        model->setData(child, Qt::Unchecked, Qt::CheckStateRole);
 	}
 	model->blockSignals(false);
 	for (int column = 0; column < model->columnCount(); ++column)
@@ -83,20 +74,14 @@ void FormGestionTodo::setTodos(const QList<QPair<int, QString> > &todos)
 
 void FormGestionTodo::setDones(const QList<DoneTask> &dones)
 {
-	QAbstractItemModel *model = ui->treeTodo->model();
+    QSortFilterProxyModel *model = static_cast<QSortFilterProxyModel *>(ui->treeTodo->model());
 	model->blockSignals(true);
-	ui->lstDone->clear();
 	for (auto &s : dones)
 	{
-		QListWidgetItem * done = new QListWidgetItem(s.nom);
-		done->setData(Qt::UserRole, s.id);
-		done->setData(Qt::UserRole + 1, s.date);
-		done->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
-		done->setCheckState(Qt::Checked);
-		ui->lstDone->addItem(done);
 		model->insertRow(0);
 		QModelIndex child = model->index(0, 0);
-		model->setData(child, s.nom, Qt::EditRole);
+        model->setData(child, s.id, Qt::UserRole);
+        model->setData(child, s.nom, Qt::EditRole);
 		child = model->index(0, 2);
 		model->setData(child, s.date, Qt::EditRole);
 	}
@@ -115,41 +100,13 @@ void FormGestionTodo::setPersonneId(int id)
 
 void FormGestionTodo::on_btnAjout_clicked()
 {
-	QListWidgetItem * todo = new QListWidgetItem("");
-	todo->setFlags(Qt::ItemIsEditable|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
-	todo->setCheckState(Qt::Unchecked);
-	todo->setData(Qt::UserRole, 0);
-	ui->lstTodo->addItem(todo);
-	ui->lstTodo->setEditTriggers(ui->lstTodo->editTriggers()|QAbstractItemView::CurrentChanged);
-	ui->lstTodo->setCurrentItem(todo);
-	ui->lstTodo->setEditTriggers(ui->lstTodo->editTriggers()&~QAbstractItemView::CurrentChanged);
 	QAbstractItemModel *model = ui->treeTodo->model();
     model->insertRow(0);
-}
-
-void FormGestionTodo::onCommitData( QWidget* editor )
-{
-	Q_UNUSED(editor);
-    TaskDelegate * s = dynamic_cast<TaskDelegate *>(sender());
-    if (s)
-    {
-        return;
-    }
-	for (auto &s : ui->lstTodo->findItems("", Qt::MatchContains))
-	{
-		if (s->data(Qt::UserRole).toInt()>0) _dbManager->modifTodo(s->data(Qt::UserRole).toInt(),
-														 s->text());
-		else
-		{
-			s->setData(Qt::UserRole, _dbManager->addTodo(s->text(), _personneId));
-		}
-	}
 }
 
 void FormGestionTodo::populate()
 {
 	_initialized = false;
-	ui->lstTodo->clear();
 	QAbstractItemModel *model = ui->treeTodo->model();
 	if (model)
 	{
@@ -167,77 +124,54 @@ void FormGestionTodo::populate()
 	_initialized = true;
 }
 
-void FormGestionTodo::on_lstTodo_itemChanged(QListWidgetItem *item)
+void FormGestionTodo::onTodoChanged(QModelIndex topLeft, QModelIndex bottomRight,
+                                    QList<int> roles)
 {
-	if (item->checkState() != Qt::Checked) return;
-	ui->lstTodo->takeItem(ui->lstTodo->row(item));
-	_dbManager->supprimeTodo(item->data(Qt::UserRole).toInt());
-	item->setData(Qt::UserRole+1, QDateTime::currentDateTime());
-	item->setFlags(item->flags() & ~Qt::ItemIsEditable);
-	ui->lstDone->addItem(item);
-	item->setData(Qt::UserRole, _dbManager->addDone(item->text(), item->data(Qt::UserRole + 1).toDateTime(),
-						_personneId));
-	QAbstractItemModel *model = ui->treeTodo->model();
-	QModelIndexList items = model->match(
-				model->index(0, 0),
-				Qt::DisplayRole,
-				item->text(),
-				1,
-				Qt::MatchRecursive);
-	if (items.isEmpty()) return;
-	const QModelIndex index = items.first();
-	model->removeRow(index.row());
-}
-
-void FormGestionTodo::on_lstDone_itemChanged(QListWidgetItem *item)
-{
-	if (item->checkState() != Qt::Unchecked) return;
-	ui->lstDone->takeItem(ui->lstDone->row(item));
-	_dbManager->supprimeDone(item->data(Qt::UserRole).toInt());
-	item->setFlags(item->flags()|Qt::ItemIsEditable);
-	ui->lstTodo->addItem(item);
-	item->setData(Qt::UserRole, _dbManager->addTodo(item->text(),
-						_personneId));
-	QAbstractItemModel *model = ui->treeTodo->model();
-    model->insertRow(0);
-    const QModelIndex child = model->index(0, 0);
-	model->setData(child, item->text(), Qt::EditRole);
-	model->setData(child, Qt::Unchecked, Qt::CheckStateRole);
-}
-
-void FormGestionTodo::onTodoChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight,
-									const QList<int> &roles)
-{
-	Q_UNUSED(roles);
+    Q_UNUSED(roles);
+    Q_UNUSED(bottomRight);
 	if (!_initialized) return;
 	auto index = topLeft;
 //	for(auto index = topLeft; index <= bottomRight; index = index.sibling(index.row()+1, 0))
 	{
 		if (index.data(Qt::CheckStateRole) == Qt::Unchecked)
 		{
-			_dbManager->supprimeDone(index.data(Qt::UserRole).toInt());
-			_dbManager->addTodo(index.data(Qt::EditRole).toString(),
+            _dbManager->supprimeDone(index.data(Qt::UserRole).toInt());
+            auto id = _dbManager->addTodo(index.data(Qt::EditRole).toString(),
 								_personneId);
+
+            QAbstractItemModel *model = ui->treeDone->model();
+            QModelIndexList items = model->match(
+                        model->index(0, 0),
+                        Qt::UserRole,
+                        index.data(Qt::UserRole).toInt(),
+                        1,
+                        Qt::MatchRecursive);
+            if (items.isEmpty()) return;
+            auto index1 = items.first();
+            model->setData(index1, id, Qt::UserRole);
 		}
 		else
 		{
 			_dbManager->supprimeTodo(index.data(Qt::UserRole).toInt());
-			_dbManager->addDone(index.data(Qt::EditRole).toString(),
-								index.siblingAtColumn(1).data(Qt::UserRole).toDateTime(),
+            QDateTime date = QDateTime::currentDateTime();
+            auto id = _dbManager->addDone(index.data(Qt::EditRole).toString(),
+                                date,
 								_personneId);
-		}
+            QAbstractItemModel *model = ui->treeTodo->model();
+            QModelIndexList items = model->match(
+                        model->index(0, 0),
+                        Qt::UserRole,
+                        index.data(Qt::UserRole).toInt(),
+                        1,
+                        Qt::MatchRecursive);
+            if (items.isEmpty()) return;
+            auto index1 = items.first();
+            model->setData(index1, id, Qt::UserRole);
+            model->setData(index1.siblingAtColumn(2), date, Qt::DisplayRole);
+            for (int column = 0; column < model->columnCount(); ++column)
+            {
+                ui->treeDone->resizeColumnToContents(column);
+            }
+        }
 	}
-}
-
-void FormGestionTodo::onDoneChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
-{
-	for(auto index = topLeft; index < bottomRight; index = index.sibling(index.row()+1, 0))
-	{
-		if (index.data(Qt::CheckStateRole) == Qt::Unchecked)
-			continue;
-		_dbManager->supprimeDone(index.data(Qt::UserRole).toInt());
-		_dbManager->addTodo(index.data(Qt::EditRole).toString(),
-								_personneId);
-	}
-
 }
