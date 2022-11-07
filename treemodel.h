@@ -56,6 +56,7 @@
 #include <QVariant>
 
 class TreeTask;
+class DbManager;
 
 //! [0]
 class TreeModel : public QAbstractItemModel
@@ -63,7 +64,7 @@ class TreeModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
-    TreeModel(const QStringList &headers,
+	TreeModel(const QStringList &headers,
               QObject *parent = nullptr);
     ~TreeModel();
 //! [0] //! [1]
@@ -95,12 +96,15 @@ public:
                     const QModelIndex &parent = QModelIndex()) override;
     bool removeRows(int position, int rows,
                     const QModelIndex &parent = QModelIndex()) override;
+	void populate(int personneId);
 
 private:
 	void setupModelData(const QStringList &lines, TreeTask *parent);
 	TreeTask *getItem(const QModelIndex &index) const;
 
 	TreeTask *rootItem;
+	DbManager * _dbManager = nullptr;
+	int _personneId = -1;
 };
 //! [2]
 
