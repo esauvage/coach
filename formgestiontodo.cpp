@@ -36,8 +36,8 @@ FormGestionTodo::FormGestionTodo(QWidget *parent) :
 	proxyDoneModel->setFilterRegularExpression(regExpDone);
 	proxyDoneModel->setFilterKeyColumn(2);
 	ui->treeDone->setModel(proxyDoneModel);
-    connect(model, SIGNAL(dataChanged(QModelIndex, QModelIndex, QList<int>)),
-            this, SLOT(onTodoChanged(QModelIndex, QModelIndex, QList<int>)));
+    connect(model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QList<int>)),
+            this, SLOT(onTodoChanged(QModelIndex,QModelIndex,QList<int>)));
 
 	TaskDelegate *delegate = new TaskDelegate();
 	ui->treeTodo->setItemDelegate(delegate);
@@ -53,48 +53,11 @@ FormGestionTodo::~FormGestionTodo()
 	delete ui;
 }
 
-void FormGestionTodo::setTodos(const QList<QPair<int, QString> > &todos)
-{
-	QAbstractItemModel *model = ui->treeTodo->model();
-	model->blockSignals(true);
-	for (auto &s : todos)
-	{
-        model->insertRow(0);
-        const QModelIndex child = model->index(0, 0);
-        model->setData(child, s.first, Qt::UserRole);
-        model->setData(child, s.second, Qt::EditRole);
-        model->setData(child, Qt::Unchecked, Qt::CheckStateRole);
-	}
-	model->blockSignals(false);
-	for (int column = 0; column < model->columnCount(); ++column)
-	{
-		ui->treeTodo->resizeColumnToContents(column);
-	}
-}
-
-void FormGestionTodo::setDones(const QList<DoneTask> &dones)
-{
-    QSortFilterProxyModel *model = static_cast<QSortFilterProxyModel *>(ui->treeTodo->model());
-	model->blockSignals(true);
-	for (auto &s : dones)
-	{
-		model->insertRow(0);
-		QModelIndex child = model->index(0, 0);
-        model->setData(child, s.id, Qt::UserRole);
-        model->setData(child, s.nom, Qt::EditRole);
-		child = model->index(0, 2);
-		model->setData(child, s.date, Qt::EditRole);
-	}
-	model->blockSignals(false);
-	for (int column = 0; column < model->columnCount(); ++column)
-	{
-		ui->treeDone->resizeColumnToContents(column);
-	}
-}
-
 void FormGestionTodo::setPersonneId(int id)
 {
 	_personneId = id;
+    TreeModel *model = static_cast<TreeModel*>(static_cast<QSortFilterProxyModel * >(ui->treeTodo->model())->sourceModel());
+    model->populate(id);
 	populate();
 }
 
@@ -107,21 +70,14 @@ void FormGestionTodo::on_btnAjout_clicked()
 void FormGestionTodo::populate()
 {
 	_initialized = false;
-	QAbstractItemModel *model = ui->treeTodo->model();
-	if (model)
-	{
-		model->removeRows(0, model->rowCount());
-	}
-	model = ui->treeDone->model();
-	if (model)
-	{
-		model->removeRows(0, model->rowCount());
-	}
 	if (_personneId <= 0) return;
-	auto todos = _dbManager->getTodos(_personneId);
-	setTodos(todos);
-	setDones(_dbManager->getDones(_personneId));
-	_initialized = true;
+    QAbstractItemModel *model = ui->treeTodo->model();
+    for (int column = 0; column < model->columnCount(); ++column)
+    {
+        ui->treeTodo->resizeColumnToContents(column);
+        ui->treeDone->resizeColumnToContents(column);
+    }
+    _initialized = true;
 }
 
 void FormGestionTodo::onTodoChanged(QModelIndex topLeft, QModelIndex bottomRight,
@@ -129,7 +85,7 @@ void FormGestionTodo::onTodoChanged(QModelIndex topLeft, QModelIndex bottomRight
 {
     Q_UNUSED(roles);
     Q_UNUSED(bottomRight);
-	if (!_initialized) return;
+    if (!_initialized) return;
 	auto index = topLeft;
 //	for(auto index = topLeft; index <= bottomRight; index = index.sibling(index.row()+1, 0))
 	{

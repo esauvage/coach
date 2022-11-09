@@ -3,7 +3,6 @@
 #include "treetask.h"
 
 #include "coachapplication.h"
-#include "dbmanager.h"
 
 #include <QtWidgets>
 
@@ -12,6 +11,7 @@ TreeModel::TreeModel(const QStringList &headers, QObject *parent)
 	: QAbstractItemModel(parent),
 	  _personneId(-1)
 {
+    Q_UNUSED(headers);
 	_dbManager = static_cast<CoachApplication *>(QApplication::instance())->dbManager();
 	rootItem = new TreeTask();
 }
@@ -175,9 +175,8 @@ void TreeModel::populate(int personneId)
 	_personneId = personneId;
 	removeRows(0, rowCount());
 	if (_personneId <= 0) return;
-	auto todos = _dbManager->getTodos(_personneId);
-//	setTodos(todos);
-//	setDones(_dbManager->getDones(_personneId));
+    setTodos(_dbManager->getTodos(_personneId));
+    setDones(_dbManager->getDones(_personneId));
 }
 
 //! [8]
@@ -192,7 +191,9 @@ int TreeModel::rowCount(const QModelIndex &parent) const
 bool TreeModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if (role != Qt::EditRole && role != Qt::CheckStateRole && role != Qt::UserRole)
+    {
         return false;
+    }
 
 	TreeTask *item = getItem(index);
 	bool result = item->setData(index.column(), value, role);
@@ -268,4 +269,36 @@ void TreeModel::setupModelData(const QStringList &lines, TreeTask *parent)
         }
         ++number;
     }
+}
+
+void TreeModel::setTodos(const QList<QPair<int, QString> > &todos)
+{
+    for (auto &s : todos)
+    {
+        insertRow(rowCount());
+
+        const QModelIndex child = index(rowCount()-1, 0);
+        TreeTask *item = getItem(child);
+        item->setData(0, s.first, Qt::UserRole);
+        item->setData(0, s.second, Qt::EditRole);
+        item->setData(0, Qt::Unchecked, Qt::CheckStateRole);
+    }
+}
+
+void TreeModel::setDones(const QList<DoneTask> &dones)
+{
+    for (auto &s : dones)
+    {
+        insertRow(rowCount());
+        QModelIndex child = index(rowCount()-1, 0);
+        TreeTask *item = getItem(child);
+        item->setData(0, s.id, Qt::UserRole);
+        item->setData(0, s.nom, Qt::EditRole);
+        item->setData(2, s.date, Qt::EditRole);
+        item->setData(0, Qt::Checked, Qt::CheckStateRole);
+//        setData(child, s.id, Qt::UserRole);
+//        setData(child, s.nom, Qt::EditRole);
+//        setData(child, Qt::Checked, Qt::CheckStateRole);
+//        setData(child.siblingAtColumn(2), s.date, Qt::EditRole);
+     }
 }

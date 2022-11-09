@@ -27,8 +27,6 @@ private slots:
     void onTodoChanged(QModelIndex topLeft, QModelIndex bottomRight, QList<int> roles);
 
 private:
-	void setTodos(const QList<QPair<int, QString> >  &todos);
-	void setDones(const QList<DoneTask> &dones);
 	void populate();
 
 	Ui::FormGestionTodo *ui;

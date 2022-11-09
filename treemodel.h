@@ -55,8 +55,9 @@
 #include <QModelIndex>
 #include <QVariant>
 
+#include "dbmanager.h"
+
 class TreeTask;
-class DbManager;
 
 //! [0]
 class TreeModel : public QAbstractItemModel
@@ -101,10 +102,12 @@ public:
 private:
 	void setupModelData(const QStringList &lines, TreeTask *parent);
 	TreeTask *getItem(const QModelIndex &index) const;
+    void setTodos(const QList<QPair<int, QString> > &todos);
+    void setDones(const QList<DoneTask> &dones);
 
 	TreeTask *rootItem;
 	DbManager * _dbManager = nullptr;
-	int _personneId = -1;
+    int _personneId = -1;
 };
 //! [2]
 
