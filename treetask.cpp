@@ -154,6 +154,8 @@ bool TreeTask::setData(int column, const QVariant &value, int role)
 		break;
 	case Qt::CheckStateRole:
         if (column) return false;
+		if (date().isValid() && (value.toInt() == Qt::Checked)) break;
+		if (!date().isValid() && (value.toInt() != Qt::Checked)) break;
 		setDate(value.toInt() == Qt::Checked ? QDateTime::currentDateTime() : QDateTime());
 		break;
     case Qt::UserRole:

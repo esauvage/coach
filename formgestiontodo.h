@@ -24,15 +24,12 @@ public:
 
 private slots:
 	void on_btnAjout_clicked();
-    void onTodoChanged(QModelIndex topLeft, QModelIndex bottomRight, QList<int> roles);
 
 private:
 	void populate();
 
 	Ui::FormGestionTodo *ui;
-	DbManager * _dbManager = nullptr;
 	int _personneId;
-	bool _initialized;
 };
 
 #endif // FORMGESTIONTODO_H

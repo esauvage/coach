@@ -199,17 +199,17 @@ Seance DbManager::getSeance(const int id) const
 	return r;
 }
 
-QList<QPair<int, QString> > DbManager::getTodos(int personneId) const
+QList<TreeTask> DbManager::getTodos(int personneId) const
 {
-	QList<QPair<int, QString> > r;
+	QList<TreeTask> r;
 	QSqlQuery query;
 	query.prepare("SELECT ID, NOM FROM TODO WHERE PERSONNE_ID = :id");
 	query.bindValue(":id", personneId);
 	query.exec();
 	while (query.next()) {
-		QPair<int, QString>v;
-		v.first = query.value(0).toInt();
-		v.second = query.value(1).toString();
+		TreeTask v;
+		v.setId(query.value(0).toInt());
+		v.setNom(query.value(1).toString());
 		r << v;
 	}
 	return r;
@@ -294,18 +294,18 @@ void DbManager::supprimeDone(int id) const
 	}
 }
 
-QList<DoneTask> DbManager::getDones(int personneId) const
+QList<TreeTask> DbManager::getDones(int personneId) const
 {
-	QList<DoneTask> r;
+	QList<TreeTask> r;
 	QSqlQuery query;
 	query.prepare("SELECT ID, NOM, DATE FROM DONE WHERE PERSONNE_ID = :id");
 	query.bindValue(":id", personneId);
 	query.exec();
 	while (query.next()) {
-		DoneTask v;
-		v.id = query.value(0).toInt();
-		v.nom = query.value(1).toString();
-		v.date = query.value(2).toDateTime();
+		TreeTask v;
+		v.setId(query.value(0).toInt());
+		v.setNom(query.value(1).toString());
+		v.setDate(query.value(2).toDateTime());
 		r << v;
 	}
 	return r;

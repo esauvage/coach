@@ -102,8 +102,8 @@ public:
 private:
 	void setupModelData(const QStringList &lines, TreeTask *parent);
 	TreeTask *getItem(const QModelIndex &index) const;
-    void setTodos(const QList<QPair<int, QString> > &todos);
-    void setDones(const QList<DoneTask> &dones);
+	void setTodos(const QList<TreeTask> &todos);
+	void setDones(const QList<TreeTask> &dones);
 
 	TreeTask *rootItem;
 	DbManager * _dbManager = nullptr;
