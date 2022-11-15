@@ -25,6 +25,7 @@ FormGestionTodo::FormGestionTodo(QWidget *parent) :
 	proxyModel->setFilterRegularExpression(regExp);
 	proxyModel->setFilterKeyColumn(2);
 	ui->treeTodo->setModel(proxyModel);
+	ui->treeTodo->hideColumn(2);
 	const auto regExpDone = QRegularExpression(".+");
 	auto proxyDoneModel = new QSortFilterProxyModel(this);
 	proxyDoneModel->setSourceModel(model);

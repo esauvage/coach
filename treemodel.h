@@ -99,6 +99,9 @@ public:
                     const QModelIndex &parent = QModelIndex()) override;
 	void populate(int personneId);
 
+private slots:
+	void onTimeout();
+
 private:
 	void setupModelData(const QStringList &lines, TreeTask *parent);
 	TreeTask *getItem(const QModelIndex &index) const;

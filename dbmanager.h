@@ -24,7 +24,7 @@ public:
 	void supprimeSeance(const Seance &v) const;
 	Seance getSeance(const int id) const;
 	QList<TreeTask> getTodos(int personneId) const;
-	void modifTodo(int id, const QString &nom) const;
+	void modifTodo(const TreeTask &v) const;
 	int addTodo(const QString &nom, int personneId) const;
 	void supprimeTodo(int id) const;
 	int addDone(const QString &nom, const QDateTime &date, int personneId) const;

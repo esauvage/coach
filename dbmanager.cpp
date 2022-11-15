@@ -203,24 +203,26 @@ QList<TreeTask> DbManager::getTodos(int personneId) const
 {
 	QList<TreeTask> r;
 	QSqlQuery query;
-	query.prepare("SELECT ID, NOM FROM TODO WHERE PERSONNE_ID = :id");
+	query.prepare("SELECT ID, NOM, RECURRENCE FROM TODO WHERE PERSONNE_ID = :id");
 	query.bindValue(":id", personneId);
 	query.exec();
 	while (query.next()) {
 		TreeTask v;
 		v.setId(query.value(0).toInt());
 		v.setNom(query.value(1).toString());
+		v.setRecurrence(query.value(2).toString());
 		r << v;
 	}
 	return r;
 }
 
-void DbManager::modifTodo(int id, const QString &nom) const
+void DbManager::modifTodo(const TreeTask &v) const
 {
 	QSqlQuery update;
-	update.prepare("UPDATE TODO SET NOM = :nom WHERE ID = :id");
-	update.bindValue(":nom", nom);
-	update.bindValue(":id", id);
+	update.prepare("UPDATE TODO SET NOM = :nom, RECURRENCE = :recurrence WHERE ID = :id");
+	update.bindValue(":nom", v.nom());
+	update.bindValue(":recurrence", v.recurrence());
+	update.bindValue(":id", v.id());
 	qDebug() << update.lastQuery();
 	update.exec();
 	qDebug() << update.executedQuery();
