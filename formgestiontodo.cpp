@@ -9,6 +9,7 @@
 #include "treemodel.h"
 #include "taskdelegate.h"
 #include "taskdonedelegate.h"
+#include "mysortfilterproxymodel.h"
 
 FormGestionTodo::FormGestionTodo(QWidget *parent) :
 	QWidget(parent),
@@ -19,7 +20,6 @@ FormGestionTodo::FormGestionTodo(QWidget *parent) :
 {
 	ui->setupUi(this);
 	_dbManager = static_cast<CoachApplication *>(QApplication::instance())->dbManager();
-	populate();
     const QStringList headers({tr("Description"), tr(""), tr("Date")});
 
     TreeModel *model = new TreeModel(headers);
@@ -31,7 +31,7 @@ FormGestionTodo::FormGestionTodo(QWidget *parent) :
 	proxyModel->setFilterKeyColumn(2);
 	ui->treeTodo->setModel(proxyModel);
 	const auto regExpDone = QRegularExpression(".+");
-	auto proxyDoneModel = new QSortFilterProxyModel(this);
+    auto proxyDoneModel = new MySortFilterProxyModel(this);
 	proxyDoneModel->setSourceModel(model);
 	proxyDoneModel->setFilterRegularExpression(regExpDone);
 	proxyDoneModel->setFilterKeyColumn(2);
@@ -46,6 +46,8 @@ FormGestionTodo::FormGestionTodo(QWidget *parent) :
     TaskDoneDelegate *taskDoneDelegate = new TaskDoneDelegate();
     ui->treeDone->setItemDelegate(taskDoneDelegate);
     ui->treeDone->hideColumn(1);
+    populate();
+    ui->treeDone->update();
 }
 
 FormGestionTodo::~FormGestionTodo()
@@ -58,7 +60,9 @@ void FormGestionTodo::setPersonneId(int id)
 	_personneId = id;
     TreeModel *model = static_cast<TreeModel*>(static_cast<QSortFilterProxyModel * >(ui->treeTodo->model())->sourceModel());
     model->populate(id);
-	populate();
+    populate();
+    static_cast<QSortFilterProxyModel * >(ui->treeDone->model())->setSourceModel(model);
+    ui->treeDone->update();
 }
 
 void FormGestionTodo::on_btnAjout_clicked()
@@ -71,12 +75,12 @@ void FormGestionTodo::populate()
 {
 	_initialized = false;
 	if (_personneId <= 0) return;
-    QAbstractItemModel *model = ui->treeTodo->model();
-    for (int column = 0; column < model->columnCount(); ++column)
-    {
-        ui->treeTodo->resizeColumnToContents(column);
-        ui->treeDone->resizeColumnToContents(column);
-    }
+//    QAbstractItemModel *model = ui->treeTodo->model();
+//    for (int column = 0; column < model->columnCount(); ++column)
+//    {
+//        ui->treeTodo->resizeColumnToContents(column);
+//        ui->treeDone->resizeColumnToContents(column);
+//    }
     _initialized = true;
 }
 
@@ -95,16 +99,16 @@ void FormGestionTodo::onTodoChanged(QModelIndex topLeft, QModelIndex bottomRight
             auto id = _dbManager->addTodo(index.data(Qt::EditRole).toString(),
 								_personneId);
 
-            QAbstractItemModel *model = ui->treeDone->model();
-            QModelIndexList items = model->match(
-                        model->index(0, 0),
-                        Qt::UserRole,
-                        index.data(Qt::UserRole).toInt(),
-                        1,
-                        Qt::MatchRecursive);
-            if (items.isEmpty()) return;
-            auto index1 = items.first();
-            model->setData(index1, id, Qt::UserRole);
+//            QAbstractItemModel *model = ui->treeDone->model();
+//            QModelIndexList items = model->match(
+//                        model->index(0, 0),
+//                        Qt::UserRole,
+//                        index.data(Qt::UserRole).toInt(),
+//                        1,
+//                        Qt::MatchRecursive);
+//            if (items.isEmpty()) return;
+//            auto index1 = items.first();
+//            model->setData(index1, id, Qt::UserRole);
 		}
 		else
 		{
@@ -113,21 +117,21 @@ void FormGestionTodo::onTodoChanged(QModelIndex topLeft, QModelIndex bottomRight
             auto id = _dbManager->addDone(index.data(Qt::EditRole).toString(),
                                 date,
 								_personneId);
-            QAbstractItemModel *model = ui->treeTodo->model();
-            QModelIndexList items = model->match(
-                        model->index(0, 0),
-                        Qt::UserRole,
-                        index.data(Qt::UserRole).toInt(),
-                        1,
-                        Qt::MatchRecursive);
-            if (items.isEmpty()) return;
-            auto index1 = items.first();
-            model->setData(index1, id, Qt::UserRole);
-            model->setData(index1.siblingAtColumn(2), date, Qt::DisplayRole);
-            for (int column = 0; column < model->columnCount(); ++column)
-            {
-                ui->treeDone->resizeColumnToContents(column);
-            }
+//            QAbstractItemModel *model = ui->treeTodo->model();
+//            QModelIndexList items = model->match(
+//                        model->index(0, 0),
+//                        Qt::UserRole,
+//                        index.data(Qt::UserRole).toInt(),
+//                        1,
+//                        Qt::MatchRecursive);
+//            if (items.isEmpty()) return;
+//            auto index1 = items.first();
+//            model->setData(index1, id, Qt::UserRole);
+//            model->setData(index1.siblingAtColumn(2), date, Qt::DisplayRole);
+//            for (int column = 0; column < model->columnCount(); ++column)
+//            {
+//                ui->treeDone->resizeColumnToContents(column);
+//            }
         }
 	}
 }

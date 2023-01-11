@@ -154,6 +154,11 @@ bool TreeTask::setData(int column, const QVariant &value, int role)
 		break;
 	case Qt::CheckStateRole:
         if (column) return false;
+        if (value.typeId()==QMetaType::QDateTime)
+        {
+            setDate(value.toDateTime());
+            break;
+        }
 		setDate(value.toInt() == Qt::Checked ? QDateTime::currentDateTime() : QDateTime());
 		break;
     case Qt::UserRole:
@@ -208,6 +213,11 @@ const QString &TreeTask::recurrence() const
 
 void TreeTask::setRecurrence(const QString &newRecurrence)
 {
-	_recurrence = newRecurrence;
+    _recurrence = newRecurrence;
+}
+
+void TreeTask::insertChild(TreeTask *child)
+{
+    childItems << child;
 }
 //! [12]

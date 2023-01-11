@@ -175,8 +175,11 @@ void TreeModel::populate(int personneId)
 	_personneId = personneId;
 	removeRows(0, rowCount());
 	if (_personneId <= 0) return;
-    setTodos(_dbManager->getTodos(_personneId));
+//    blockSignals(true);
     setDones(_dbManager->getDones(_personneId));
+    setTodos(_dbManager->getTodos(_personneId));
+//    blockSignals(false);
+//    emit dataChanged(index(0, 0), index(rowCount(), 2), {Qt::DisplayRole, Qt::EditRole, Qt::CheckStateRole});
 }
 
 //! [8]
@@ -287,18 +290,25 @@ void TreeModel::setTodos(const QList<QPair<int, QString> > &todos)
 
 void TreeModel::setDones(const QList<DoneTask> &dones)
 {
+    TreeTask *parentItem = getItem(QModelIndex());
+    if (!parentItem)
+        return;
+    beginInsertRows(QModelIndex(), 0, dones.size());
     for (auto &s : dones)
     {
-        insertRow(rowCount());
-        QModelIndex child = index(rowCount()-1, 0);
-        TreeTask *item = getItem(child);
+//        insertRow(rowCount());
+//        const QModelIndex child = index(rowCount()-1, 0);
+        TreeTask *item = new TreeTask();
         item->setData(0, s.id, Qt::UserRole);
         item->setData(0, s.nom, Qt::EditRole);
         item->setData(2, s.date, Qt::EditRole);
-        item->setData(0, Qt::Checked, Qt::CheckStateRole);
+        parentItem->insertChild(item);
+//        item->setDate(s.date);
+//        item->setData(0, Qt::Checked, Qt::CheckStateRole);
 //        setData(child, s.id, Qt::UserRole);
 //        setData(child, s.nom, Qt::EditRole);
 //        setData(child, Qt::Checked, Qt::CheckStateRole);
 //        setData(child.siblingAtColumn(2), s.date, Qt::EditRole);
      }
+    endInsertRows();
 }

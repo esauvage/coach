@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 The Qt Company Ltd.
+** Copyright (C) 2020 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the examples of the Qt Toolkit.
@@ -48,50 +48,36 @@
 **
 ****************************************************************************/
 
-#ifndef TreeTask_H
-#define TreeTask_H
+#ifndef MYSORTFILTERPROXYMODEL_H
+#define MYSORTFILTERPROXYMODEL_H
 
-#include <QVariant>
-#include <QVector>
-#include <QDateTime>
+#include <QDate>
+#include <QSortFilterProxyModel>
 
 //! [0]
-class TreeTask
+class MySortFilterProxyModel : public QSortFilterProxyModel
 {
-public:
-	explicit TreeTask(TreeTask *parent = nullptr);
-	~TreeTask();
+    Q_OBJECT
 
-	TreeTask *child(int number);
-    int childCount() const;
-    int columnCount() const;
-	QVariant data(int column, int role = Qt::DiffuseDither) const;
-    bool insertChildren(int position, int count, int columns);
-    bool insertColumns(int position, int columns);
-	TreeTask *parent();
-    bool removeChildren(int position, int count);
-    bool removeColumns(int position, int columns);
-    int childNumber() const;
-	bool setData(int column, const QVariant &value, int role = Qt::EditRole);
-	bool setId(int v);
-	int id() const;
-	bool setNom(const QString &v);
-	QString nom() const;
-	bool setDate(const QDateTime &d);
-	QDateTime date() const;
-	const QString &recurrence() const;
-	void setRecurrence(const QString &newRecurrence);
-    void insertChild(TreeTask * child);
+public:
+    MySortFilterProxyModel(QObject *parent = nullptr);
+
+    QDate filterMinimumDate() const { return minDate; }
+    void setFilterMinimumDate(QDate date);
+
+    QDate filterMaximumDate() const { return maxDate; }
+    void setFilterMaximumDate(QDate date);
+
+protected:
+    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+    bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
 
 private:
-	QVector<TreeTask*> childItems;
-	QHash<int, QVector<QVariant> > itemData;
-	TreeTask *parentItem;
-	QString _nom;
-	QString _recurrence;
-	QDateTime _date;
-	int _id;
+    bool dateInRange(QDate date) const;
+
+    QDate minDate;
+    QDate maxDate;
 };
 //! [0]
 
-#endif // TreeTask_H
+#endif // MYSORTFILTERPROXYMODEL_H

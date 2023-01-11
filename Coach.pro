@@ -18,6 +18,7 @@ SOURCES += \
     formgestiontodo.cpp \
     main.cpp \
     coachmainwindow.cpp \
+    mysortfilterproxymodel.cpp \
     personne.cpp \
     seance.cpp \
     taskdelegate.cpp \
@@ -34,6 +35,7 @@ HEADERS += \
     formgestionpersonnes.h \
     formgestionseances.h \
     formgestiontodo.h \
+    mysortfilterproxymodel.h \
     personne.h \
     seance.h \
     taskdelegate.h \
