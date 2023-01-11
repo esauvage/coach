@@ -30,21 +30,20 @@ FormGestionTodo::FormGestionTodo(QWidget *parent) :
 	proxyModel->setFilterRegularExpression(regExp);
 	proxyModel->setFilterKeyColumn(2);
 	ui->treeTodo->setModel(proxyModel);
+	ui->treeTodo->hideColumn(2);
 	const auto regExpDone = QRegularExpression(".+");
     auto proxyDoneModel = new MySortFilterProxyModel(this);
 	proxyDoneModel->setSourceModel(model);
 	proxyDoneModel->setFilterRegularExpression(regExpDone);
 	proxyDoneModel->setFilterKeyColumn(2);
 	ui->treeDone->setModel(proxyDoneModel);
-    connect(model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QList<int>)),
-            this, SLOT(onTodoChanged(QModelIndex,QModelIndex,QList<int>)));
+//    connect(model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QList<int>)),
+//            this, SLOT(onTodoChanged(QModelIndex,QModelIndex,QList<int>)));
 
-	TaskDelegate *delegate = new TaskDelegate();
-	ui->treeTodo->setItemDelegate(delegate);
-    connect(ui->treeTodo->itemDelegate(), SIGNAL(commitData(QWidget*)),
-            this, SLOT(onCommitData(QWidget*)));
-    TaskDoneDelegate *taskDoneDelegate = new TaskDoneDelegate();
-    ui->treeDone->setItemDelegate(taskDoneDelegate);
+//	TaskDelegate *delegate = new TaskDelegate();
+//	ui->treeTodo->setItemDelegate(delegate);
+//    TaskDoneDelegate *taskDoneDelegate = new TaskDoneDelegate();
+//    ui->treeDone->setItemDelegate(taskDoneDelegate);
     ui->treeDone->hideColumn(1);
     populate();
     ui->treeDone->update();
@@ -57,12 +56,10 @@ FormGestionTodo::~FormGestionTodo()
 
 void FormGestionTodo::setPersonneId(int id)
 {
-	_personneId = id;
+//	_personneId = id;
     TreeModel *model = static_cast<TreeModel*>(static_cast<QSortFilterProxyModel * >(ui->treeTodo->model())->sourceModel());
     model->populate(id);
     populate();
-    static_cast<QSortFilterProxyModel * >(ui->treeDone->model())->setSourceModel(model);
-    ui->treeDone->update();
 }
 
 void FormGestionTodo::on_btnAjout_clicked()

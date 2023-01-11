@@ -48,7 +48,7 @@ int TreeTask::childNumber() const
 //! [5]
 int TreeTask::columnCount() const
 {
-    return 3;
+	return 4;
 }
 //! [5]
 
@@ -66,9 +66,11 @@ QVariant TreeTask::data(int column, int role) const
             return _nom;
         case 1:
             return _recurrence;
-        case 2:
-            return _date;
-        }
+		case 2:
+			return _date;
+		case 3:
+			return _elapsed;
+		}
     case Qt::CheckStateRole:
         return column ? QVariant() : (_date.isValid() ? Qt::Checked : Qt::Unchecked);
     case Qt::UserRole:
@@ -214,6 +216,14 @@ const QString &TreeTask::recurrence() const
 void TreeTask::setRecurrence(const QString &newRecurrence)
 {
     _recurrence = newRecurrence;
+}
+
+void TreeTask::setElapsedTime(const qint64 v)
+{
+	if (_date.isValid())
+	{
+		_elapsed = v;
+	}
 }
 
 void TreeTask::insertChild(TreeTask *child)

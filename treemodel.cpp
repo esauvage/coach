@@ -14,6 +14,9 @@ TreeModel::TreeModel(const QStringList &headers, QObject *parent)
     Q_UNUSED(headers);
 	_dbManager = static_cast<CoachApplication *>(QApplication::instance())->dbManager();
 	rootItem = new TreeTask();
+	QTimer timer;
+	timer.setInterval(1000);
+	connect(&timer,  SIGNAL(timeout()), this, SLOT(onTimeout()));
 }
 //! [0]
 
@@ -177,9 +180,16 @@ void TreeModel::populate(int personneId)
 	if (_personneId <= 0) return;
 //    blockSignals(true);
     setDones(_dbManager->getDones(_personneId));
-    setTodos(_dbManager->getTodos(_personneId));
-//    blockSignals(false);
-//    emit dataChanged(index(0, 0), index(rowCount(), 2), {Qt::DisplayRole, Qt::EditRole, Qt::CheckStateRole});
+//	emit dataChanged(index(0, 0), index(rowCount()-1, columnCount()-1), {Qt::DisplayRole});
+}
+
+void TreeModel::onTimeout()
+{
+	for (auto row = 0 ; row < rowCount(); ++row)
+	{
+		TreeTask * task = getItem(index(row, 0));
+		task->setElapsedTime(task->date().secsTo(QDateTime::currentDateTime()));
+	}
 }
 
 //! [8]
@@ -191,19 +201,60 @@ int TreeModel::rowCount(const QModelIndex &parent) const
 }
 //! [8]
 
-bool TreeModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool TreeModel::setData(const QModelIndex &current, const QVariant &value, int role)
 {
     if (role != Qt::EditRole && role != Qt::CheckStateRole && role != Qt::UserRole)
     {
         return false;
     }
 
-	TreeTask *item = getItem(index);
-	bool result = item->setData(index.column(), value, role);
+	TreeTask *item = getItem(current);
+	bool result = item->setData(current.column(), value, role);
 
     if (result)
-        emit dataChanged(index, index, {Qt::DisplayRole, role});
-
+	{
+		if (role == Qt::CheckStateRole)
+		{
+			if (item->date().isValid())
+			{
+				_dbManager->supprimeDone(item->id());
+				if (item->recurrence().isEmpty())
+				{
+					item->setId(_dbManager->addTodo(item->nom(),
+									_personneId));
+				}
+			}
+			else
+			{
+				item->setDate(QDateTime::currentDateTime());
+				if (item->recurrence().isEmpty())
+				{
+					_dbManager->supprimeTodo(item->id());
+				}
+//				else
+//				{
+//					auto todo = match(index(0, 0),Qt::DisplayRole, item->nom());
+//					TreeTask * todoItem = getItem(todo.first());
+//				}
+				item->setId(_dbManager->addDone(item->nom(),
+									item->date(),
+									_personneId));
+			}
+		}
+		else
+		{
+			if (item->id() <= 0)
+			{
+				item->setId(_dbManager->addTodo(item->nom(),
+									_personneId));
+			}
+			if (!item->date().isValid())
+			{
+				_dbManager->modifTodo(*item);
+			}
+		}
+		emit dataChanged(current, current, {Qt::DisplayRole, role});
+	}
     return result;
 }
 
@@ -221,60 +272,7 @@ bool TreeModel::setHeaderData(int section, Qt::Orientation orientation,
     return result;
 }
 
-void TreeModel::setupModelData(const QStringList &lines, TreeTask *parent)
-{
-	QVector<TreeTask*> parents;
-    QVector<int> indentations;
-    parents << parent;
-    indentations << 0;
-
-    int number = 0;
-
-    while (number < lines.count()) {
-        int position = 0;
-        while (position < lines[number].length()) {
-            if (lines[number].at(position) != ' ')
-                break;
-            ++position;
-        }
-
-        const QString lineData = lines[number].mid(position).trimmed();
-
-        if (!lineData.isEmpty()) {
-            // Read the column data from the rest of the line.
-            const QStringList columnStrings =
-                lineData.split(QLatin1Char('\t'), Qt::SkipEmptyParts);
-            QVector<QVariant> columnData;
-            columnData.reserve(columnStrings.size());
-            for (const QString &columnString : columnStrings)
-                columnData << columnString;
-
-            if (position > indentations.last()) {
-                // The last child of the current parent is now the new parent
-                // unless the current parent has no children.
-
-                if (parents.last()->childCount() > 0) {
-                    parents << parents.last()->child(parents.last()->childCount()-1);
-                    indentations << position;
-                }
-            } else {
-                while (position < indentations.last() && parents.count() > 0) {
-                    parents.pop_back();
-                    indentations.pop_back();
-                }
-            }
-
-            // Append a new item to the current parent's list of children.
-			TreeTask *parent = parents.last();
-            parent->insertChildren(parent->childCount(), 1, rootItem->columnCount());
-            for (int column = 0; column < columnData.size(); ++column)
-                parent->child(parent->childCount() - 1)->setData(column, columnData[column]);
-        }
-        ++number;
-    }
-}
-
-void TreeModel::setTodos(const QList<QPair<int, QString> > &todos)
+void TreeModel::setTodos(const QList<TreeTask> &todos)
 {
     for (auto &s : todos)
     {
@@ -282,13 +280,13 @@ void TreeModel::setTodos(const QList<QPair<int, QString> > &todos)
 
         const QModelIndex child = index(rowCount()-1, 0);
         TreeTask *item = getItem(child);
-        item->setData(0, s.first, Qt::UserRole);
-        item->setData(0, s.second, Qt::EditRole);
-        item->setData(0, Qt::Unchecked, Qt::CheckStateRole);
+		item->setId(s.id());
+		item->setNom(s.nom());
+		item->setRecurrence(s.recurrence());
     }
 }
 
-void TreeModel::setDones(const QList<DoneTask> &dones)
+void TreeModel::setDones(const QList<TreeTask> &dones)
 {
     TreeTask *parentItem = getItem(QModelIndex());
     if (!parentItem)

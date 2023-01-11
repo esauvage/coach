@@ -6,13 +6,7 @@
 
 #include "personne.h"
 #include "seance.h"
-
-struct DoneTask
-{
-	QString nom;
-	QDateTime date;
-	int id;
-};
+#include "treetask.h"
 
 class DbManager
 {
@@ -29,13 +23,13 @@ public:
 	void modifSeance(const Seance &v) const;
 	void supprimeSeance(const Seance &v) const;
 	Seance getSeance(const int id) const;
-	QList<QPair<int, QString> > getTodos(int personneId) const;
-	void modifTodo(int id, const QString &nom) const;
+	QList<TreeTask> getTodos(int personneId) const;
+	void modifTodo(const TreeTask &v) const;
 	int addTodo(const QString &nom, int personneId) const;
 	void supprimeTodo(int id) const;
 	int addDone(const QString &nom, const QDateTime &date, int personneId) const;
 	void supprimeDone(int id) const;
-	QList<DoneTask> getDones(int personneId) const;
+	QList<TreeTask> getDones(int personneId) const;
 private:
     QSqlDatabase m_db;
 };

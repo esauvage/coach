@@ -82,6 +82,7 @@ public:
 	const QString &recurrence() const;
 	void setRecurrence(const QString &newRecurrence);
     void insertChild(TreeTask * child);
+	void setElapsedTime(const qint64 v);
 
 private:
 	QVector<TreeTask*> childItems;
@@ -90,6 +91,7 @@ private:
 	QString _nom;
 	QString _recurrence;
 	QDateTime _date;
+	qint64 _elapsed;
 	int _id;
 };
 //! [0]
