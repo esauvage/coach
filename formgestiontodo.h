@@ -5,6 +5,7 @@
 #include <QModelIndex>
 
 #include "dbmanager.h"
+#include "treemodel.h"
 
 namespace Ui {
 class FormGestionTodo;
@@ -24,6 +25,8 @@ public:
 
 private slots:
 	void on_btnAjout_clicked();
+    void onTodoChanged(QModelIndex topLeft, QModelIndex bottomRight,
+                                        QList<int> roles);
 
 private:
 	void populate();
@@ -32,6 +35,7 @@ private:
 	int _personneId;
     DbManager *_dbManager;
     bool _initialized;
+    TreeModel *model;
 };
 
 #endif // FORMGESTIONTODO_H

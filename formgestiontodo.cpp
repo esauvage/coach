@@ -4,10 +4,10 @@
 #include "coachapplication.h"
 #include "dbmanager.h"
 
-#include <QSortFilterProxyModel>
+//#include <QSortFilterProxyModel>
 
 #include "treemodel.h"
-#include "taskdelegate.h"
+//#include "taskdelegate.h"
 #include "taskdonedelegate.h"
 #include "mysortfilterproxymodel.h"
 
@@ -22,19 +22,21 @@ FormGestionTodo::FormGestionTodo(QWidget *parent) :
 	_dbManager = static_cast<CoachApplication *>(QApplication::instance())->dbManager();
     const QStringList headers({tr("Description"), tr(""), tr("Date")});
 
-    TreeModel *model = new TreeModel(headers);
+    model = new TreeModel(headers);
 	const auto regExp = QRegularExpression("^$");
 
-	auto proxyModel = new QSortFilterProxyModel(this);
-	proxyModel->setSourceModel(model);
-	proxyModel->setFilterRegularExpression(regExp);
+    auto proxyModel = new MySortFilterProxyModel(this, true);
+    proxyModel->setExcludeDates(true);
+    proxyModel->setSourceModel(model);
+//	proxyModel->setFilterRegularExpression(regExp);
 	proxyModel->setFilterKeyColumn(2);
 	ui->treeTodo->setModel(proxyModel);
-	ui->treeTodo->hideColumn(2);
+//	ui->treeTodo->hideColumn(2);
 	const auto regExpDone = QRegularExpression(".+");
-    auto proxyDoneModel = new MySortFilterProxyModel(this);
-	proxyDoneModel->setSourceModel(model);
-	proxyDoneModel->setFilterRegularExpression(regExpDone);
+    auto proxyDoneModel = new MySortFilterProxyModel(this, false);
+    proxyDoneModel->setExcludeDates(false);
+    proxyDoneModel->setSourceModel(model);
+//	proxyDoneModel->setFilterRegularExpression(regExpDone);
 	proxyDoneModel->setFilterKeyColumn(2);
 	ui->treeDone->setModel(proxyDoneModel);
 //    connect(model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QList<int>)),
@@ -42,22 +44,23 @@ FormGestionTodo::FormGestionTodo(QWidget *parent) :
 
 //	TaskDelegate *delegate = new TaskDelegate();
 //	ui->treeTodo->setItemDelegate(delegate);
-//    TaskDoneDelegate *taskDoneDelegate = new TaskDoneDelegate();
-//    ui->treeDone->setItemDelegate(taskDoneDelegate);
+    TaskDoneDelegate *taskDoneDelegate = new TaskDoneDelegate();
+    ui->treeDone->setItemDelegate(taskDoneDelegate);
     ui->treeDone->hideColumn(1);
-    populate();
-    ui->treeDone->update();
+//    populate();
+//    ui->treeDone->update();
 }
 
 FormGestionTodo::~FormGestionTodo()
 {
 	delete ui;
+    delete model;
 }
 
 void FormGestionTodo::setPersonneId(int id)
 {
-//	_personneId = id;
-    TreeModel *model = static_cast<TreeModel*>(static_cast<QSortFilterProxyModel * >(ui->treeTodo->model())->sourceModel());
+    _personneId = id;
+//    TreeModel *model = static_cast<TreeModel*>(static_cast<QSortFilterProxyModel * >(ui->treeTodo->model())->sourceModel());
     model->populate(id);
     populate();
 }
@@ -86,7 +89,7 @@ void FormGestionTodo::onTodoChanged(QModelIndex topLeft, QModelIndex bottomRight
 {
     Q_UNUSED(roles);
     Q_UNUSED(bottomRight);
-    if (!_initialized) return;
+//    if (!_initialized) return;
 	auto index = topLeft;
 //	for(auto index = topLeft; index <= bottomRight; index = index.sibling(index.row()+1, 0))
 	{

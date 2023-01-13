@@ -53,8 +53,9 @@
 #include <QtWidgets>
 
 //! [0]
-MySortFilterProxyModel::MySortFilterProxyModel(QObject *parent)
-    : QSortFilterProxyModel(parent)
+MySortFilterProxyModel::MySortFilterProxyModel(QObject *parent, bool excludeDates)
+    : QSortFilterProxyModel(parent),
+      _excludeDates(excludeDates)
 {
 }
 //! [0]
@@ -79,15 +80,11 @@ void MySortFilterProxyModel::setFilterMaximumDate(QDate date)
 bool MySortFilterProxyModel::filterAcceptsRow(int sourceRow,
                                               const QModelIndex &sourceParent) const
 {
-
     QModelIndex index0 = sourceModel()->index(sourceRow, 2, sourceParent);
-    return sourceModel()->data(index0).toDate().isValid();
-//    QModelIndex index1 = sourceModel()->index(sourceRow, 1, sourceParent);
-//    QModelIndex index2 = sourceModel()->index(sourceRow, 2, sourceParent);
-
-//    return (sourceModel()->data(index0).toString().contains(filterRegularExpression())
-//            || sourceModel()->data(index1).toString().contains(filterRegularExpression()))
-//            && dateInRange(sourceModel()->data(index2).toDate());
+    const bool hasDate = sourceModel()->data(index0).toDateTime().isValid();
+    if (_excludeDates)
+        return !hasDate;
+    return _excludeDates ? !hasDate : hasDate;
 }
 //! [3]
 
@@ -128,5 +125,16 @@ bool MySortFilterProxyModel::dateInRange(QDate date) const
 {
     return (!minDate.isValid() || date > minDate)
             && (!maxDate.isValid() || date < maxDate);
+}
+
+bool MySortFilterProxyModel::excludeDates() const
+{
+    return _excludeDates;
+}
+
+void MySortFilterProxyModel::setExcludeDates(bool newExcludeDates)
+{
+    _excludeDates = newExcludeDates;
+    invalidateFilter();
 }
 //! [7]

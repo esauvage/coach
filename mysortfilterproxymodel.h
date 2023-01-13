@@ -60,13 +60,16 @@ class MySortFilterProxyModel : public QSortFilterProxyModel
     Q_OBJECT
 
 public:
-    MySortFilterProxyModel(QObject *parent = nullptr);
+    MySortFilterProxyModel(QObject *parent = nullptr, bool excludeDates=false);
 
     QDate filterMinimumDate() const { return minDate; }
     void setFilterMinimumDate(QDate date);
 
     QDate filterMaximumDate() const { return maxDate; }
     void setFilterMaximumDate(QDate date);
+
+    bool excludeDates() const;
+    void setExcludeDates(bool newExcludeDates);
 
 protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
@@ -77,6 +80,7 @@ private:
 
     QDate minDate;
     QDate maxDate;
+    bool _excludeDates;
 };
 //! [0]
 

@@ -179,8 +179,9 @@ void TreeModel::populate(int personneId)
 	removeRows(0, rowCount());
 	if (_personneId <= 0) return;
 //    blockSignals(true);
+    setDones(_dbManager->getTodos(_personneId));
     setDones(_dbManager->getDones(_personneId));
-//	emit dataChanged(index(0, 0), index(rowCount()-1, columnCount()-1), {Qt::DisplayRole});
+    emit dataChanged(index(0, 0), index(rowCount()-1, columnCount()-1), {Qt::DisplayRole});
 }
 
 void TreeModel::onTimeout()
@@ -215,7 +216,7 @@ bool TreeModel::setData(const QModelIndex &current, const QVariant &value, int r
 	{
 		if (role == Qt::CheckStateRole)
 		{
-			if (item->date().isValid())
+            if (value != Qt::CheckState::Checked)
 			{
 				_dbManager->supprimeDone(item->id());
 				if (item->recurrence().isEmpty())
@@ -272,19 +273,19 @@ bool TreeModel::setHeaderData(int section, Qt::Orientation orientation,
     return result;
 }
 
-void TreeModel::setTodos(const QList<TreeTask> &todos)
-{
-    for (auto &s : todos)
-    {
-        insertRow(rowCount());
+//void TreeModel::setTodos(const QList<TreeTask> &todos)
+//{
+//    for (auto &s : todos)
+//    {
+//        insertRow(rowCount());
 
-        const QModelIndex child = index(rowCount()-1, 0);
-        TreeTask *item = getItem(child);
-		item->setId(s.id());
-		item->setNom(s.nom());
-		item->setRecurrence(s.recurrence());
-    }
-}
+//        const QModelIndex child = index(rowCount()-1, 0);
+//        TreeTask *item = getItem(child);
+//		item->setId(s.id());
+//		item->setNom(s.nom());
+//		item->setRecurrence(s.recurrence());
+//    }
+//}
 
 void TreeModel::setDones(const QList<TreeTask> &dones)
 {
@@ -296,11 +297,11 @@ void TreeModel::setDones(const QList<TreeTask> &dones)
     {
 //        insertRow(rowCount());
 //        const QModelIndex child = index(rowCount()-1, 0);
-        TreeTask *item = new TreeTask();
-        item->setData(0, s.id, Qt::UserRole);
-        item->setData(0, s.nom, Qt::EditRole);
-        item->setData(2, s.date, Qt::EditRole);
-        parentItem->insertChild(item);
+//        TreeTask *item = new TreeTask();
+//        item->setData(0, s.id, Qt::UserRole);
+//        item->setData(0, s.nom, Qt::EditRole);
+//        item->setData(2, s.date, Qt::EditRole);
+        parentItem->insertChild(s);
 //        item->setDate(s.date);
 //        item->setData(0, Qt::Checked, Qt::CheckStateRole);
 //        setData(child, s.id, Qt::UserRole);

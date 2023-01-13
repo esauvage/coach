@@ -60,9 +60,11 @@ class TreeTask
 {
 public:
 	explicit TreeTask(TreeTask *parent = nullptr);
+    TreeTask(const TreeTask &ref);
 	~TreeTask();
 
 	TreeTask *child(int number);
+    QVector<TreeTask*> childItems() const;
     int childCount() const;
     int columnCount() const;
 	QVariant data(int column, int role = Qt::DiffuseDither) const;
@@ -81,12 +83,12 @@ public:
 	QDateTime date() const;
 	const QString &recurrence() const;
 	void setRecurrence(const QString &newRecurrence);
-    void insertChild(TreeTask * child);
+    void insertChild(const TreeTask &child);
 	void setElapsedTime(const qint64 v);
+    qint64 elapsed() const;
 
 private:
-	QVector<TreeTask*> childItems;
-	QHash<int, QVector<QVariant> > itemData;
+    QVector<TreeTask*> _childItems;
 	TreeTask *parentItem;
 	QString _nom;
 	QString _recurrence;

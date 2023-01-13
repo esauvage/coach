@@ -9,30 +9,46 @@
 
 //! [0]
 TreeTask::TreeTask(TreeTask *parent)
-    :parentItem(parent)
+    :parentItem(parent),
+      _date(QDateTime())
+{}
+
+TreeTask::TreeTask(const TreeTask &ref)
+    :_childItems(ref.childItems()),
+        parentItem(ref.parentItem),
+      _nom(ref.nom()),
+      _recurrence(ref.recurrence()),
+      _date(ref.date()),
+      _elapsed(ref.elapsed()),
+      _id(ref.id())
 {}
 //! [0]
 
 //! [1]
 TreeTask::~TreeTask()
 {
-	qDeleteAll(childItems);
+    qDeleteAll(_childItems);
 }
 //! [1]
 
 //! [2]
 TreeTask *TreeTask::child(int number)
 {
-	if (number < 0 || number >= childItems.size())
+    if (number < 0 || number >= _childItems.size())
 		return nullptr;
-	return childItems.at(number);
+    return _childItems.at(number);
+}
+
+QVector<TreeTask *> TreeTask::childItems() const
+{
+    return _childItems;
 }
 //! [2]
 
 //! [3]
 int TreeTask::childCount() const
 {
-	return childItems.count();
+    return _childItems.count();
 }
 //! [3]
 
@@ -40,7 +56,7 @@ int TreeTask::childCount() const
 int TreeTask::childNumber() const
 {
 	if (parentItem)
-		return parentItem->childItems.indexOf(const_cast<TreeTask*>(this));
+        return parentItem->childItems().indexOf(const_cast<TreeTask*>(this));
 	return 0;
 }
 //! [4]
@@ -85,12 +101,12 @@ QVariant TreeTask::data(int column, int role) const
 bool TreeTask::insertChildren(int position, int count, int columns)
 {
 	Q_UNUSED(columns);
-	if (position < 0 || position > childItems.size())
+    if (position < 0 || position > _childItems.size())
 		return false;
 
 	for (int row = 0; row < count; ++row) {
         TreeTask *item = new TreeTask(this);
-		childItems.insert(position, item);
+        _childItems.insert(position, item);
 	}
 	return true;
 }
@@ -102,7 +118,7 @@ bool TreeTask::insertColumns(int position, int columns)
     if (position < 0 || position > columnCount())
         return false;
 
-    for (TreeTask *child : qAsConst(childItems))
+    for (TreeTask *child : qAsConst(_childItems))
         child->insertColumns(position, columns);
 
     return true;
@@ -119,11 +135,11 @@ TreeTask *TreeTask::parent()
 //! [10]
 bool TreeTask::removeChildren(int position, int count)
 {
-	if (position < 0 || position + count > childItems.size())
+    if (position < 0 || position + count > _childItems.size())
 		return false;
 
 	for (int row = 0; row < count; ++row)
-		delete childItems.takeAt(position);
+        delete _childItems.takeAt(position);
 
 	return true;
 }
@@ -134,7 +150,7 @@ bool TreeTask::removeColumns(int position, int columns)
     if (position < 0 || position + columns > columnCount())
         return false;
 
-    for (TreeTask *child : qAsConst(childItems))
+    for (TreeTask *child : qAsConst(_childItems))
         child->removeColumns(position, columns);
 
     return true;
@@ -223,11 +239,17 @@ void TreeTask::setElapsedTime(const qint64 v)
 	if (_date.isValid())
 	{
 		_elapsed = v;
-	}
+    }
 }
 
-void TreeTask::insertChild(TreeTask *child)
+qint64 TreeTask::elapsed() const
 {
-    childItems << child;
+    return _elapsed;
+}
+
+void TreeTask::insertChild(const TreeTask &child)
+{
+    TreeTask * n = new TreeTask(child);
+    _childItems << n;
 }
 //! [12]
