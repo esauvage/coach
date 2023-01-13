@@ -25,16 +25,12 @@ public:
 
 private slots:
 	void on_btnAjout_clicked();
-    void onTodoChanged(QModelIndex topLeft, QModelIndex bottomRight,
-                                        QList<int> roles);
 
 private:
 	void populate();
 
 	Ui::FormGestionTodo *ui;
 	int _personneId;
-    DbManager *_dbManager;
-    bool _initialized;
     TreeModel *model;
 };
 

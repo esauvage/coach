@@ -21,6 +21,7 @@ FormGestionPersonnes::FormGestionPersonnes(QWidget *parent) :
 	const int index = ui->comboBox->findData(lastUser);
 	if (index >= 0)
 		ui->comboBox->setCurrentIndex(index);
+    ui->btnEdit->hide();
 }
 
 FormGestionPersonnes::~FormGestionPersonnes()
@@ -92,6 +93,7 @@ void FormGestionPersonnes::on_edtPassword_editingFinished()
 	{
 		ui->lblPasswd->hide();
 		ui->edtPassword->hide();
-		emit curUserChanged();
+        ui->btnEdit->show();
+        emit curUserChanged();
 	}
 }

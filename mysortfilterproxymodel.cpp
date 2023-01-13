@@ -82,8 +82,6 @@ bool MySortFilterProxyModel::filterAcceptsRow(int sourceRow,
 {
     QModelIndex index0 = sourceModel()->index(sourceRow, 2, sourceParent);
     const bool hasDate = sourceModel()->data(index0).toDateTime().isValid();
-    if (_excludeDates)
-        return !hasDate;
     return _excludeDates ? !hasDate : hasDate;
 }
 //! [3]
