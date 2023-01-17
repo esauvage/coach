@@ -9,6 +9,8 @@ class TaskDelegate : public QStyledItemDelegate
 	Q_OBJECT
 public:
 	explicit TaskDelegate(QObject *parent = nullptr);
+signals:
+    void keyReleased(QKeyEvent * event);
 protected:
     virtual bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) override;
 };

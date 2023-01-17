@@ -162,12 +162,18 @@ bool TreeModel::removeColumns(int position, int columns, const QModelIndex &pare
 bool TreeModel::removeRows(int position, int rows, const QModelIndex &parent)
 {
     if (!rows) return true;
-	TreeTask *parentItem = getItem(parent);
+    TreeTask * parentItem = getItem(QModelIndex());
     if (!parentItem)
         return false;
-
     beginRemoveRows(parent, position, position + rows - 1);
-    const bool success = parentItem->removeChildren(position, rows);
+    for (auto i = position; i < position + rows; ++i)
+    {
+        TreeTask *item = getItem(index(i, 0));
+        if (!item)
+            continue;
+        _dbManager->supprimeTodo(item->id());
+    }
+    bool success = parentItem->removeChildren(position, rows);
     endRemoveRows();
 
 	return success;
@@ -178,7 +184,6 @@ void TreeModel::populate(int personneId)
 	_personneId = personneId;
 	removeRows(0, rowCount());
 	if (_personneId <= 0) return;
-//    blockSignals(true);
     setDones(_dbManager->getTodos(_personneId));
     setDones(_dbManager->getDones(_personneId));
     emit dataChanged(index(0, 0), index(rowCount()-1, columnCount()-1), {Qt::DisplayRole});
@@ -232,11 +237,6 @@ bool TreeModel::setData(const QModelIndex &current, const QVariant &value, int r
 				{
 					_dbManager->supprimeTodo(item->id());
 				}
-//				else
-//				{
-//					auto todo = match(index(0, 0),Qt::DisplayRole, item->nom());
-//					TreeTask * todoItem = getItem(todo.first());
-//				}
 				item->setId(_dbManager->addDone(item->nom(),
 									item->date(),
 									_personneId));
@@ -273,20 +273,6 @@ bool TreeModel::setHeaderData(int section, Qt::Orientation orientation,
     return result;
 }
 
-//void TreeModel::setTodos(const QList<TreeTask> &todos)
-//{
-//    for (auto &s : todos)
-//    {
-//        insertRow(rowCount());
-
-//        const QModelIndex child = index(rowCount()-1, 0);
-//        TreeTask *item = getItem(child);
-//		item->setId(s.id());
-//		item->setNom(s.nom());
-//		item->setRecurrence(s.recurrence());
-//    }
-//}
-
 void TreeModel::setDones(const QList<TreeTask> &dones)
 {
     TreeTask *parentItem = getItem(QModelIndex());
@@ -295,19 +281,7 @@ void TreeModel::setDones(const QList<TreeTask> &dones)
     beginInsertRows(QModelIndex(), 0, dones.size());
     for (auto &s : dones)
     {
-//        insertRow(rowCount());
-//        const QModelIndex child = index(rowCount()-1, 0);
-//        TreeTask *item = new TreeTask();
-//        item->setData(0, s.id, Qt::UserRole);
-//        item->setData(0, s.nom, Qt::EditRole);
-//        item->setData(2, s.date, Qt::EditRole);
         parentItem->insertChild(s);
-//        item->setDate(s.date);
-//        item->setData(0, Qt::Checked, Qt::CheckStateRole);
-//        setData(child, s.id, Qt::UserRole);
-//        setData(child, s.nom, Qt::EditRole);
-//        setData(child, Qt::Checked, Qt::CheckStateRole);
-//        setData(child.siblingAtColumn(2), s.date, Qt::EditRole);
-     }
+    }
     endInsertRows();
 }

@@ -4,7 +4,6 @@
 #include <QWidget>
 #include <QModelIndex>
 
-#include "dbmanager.h"
 #include "treemodel.h"
 
 namespace Ui {
@@ -25,6 +24,10 @@ public:
 
 private slots:
 	void on_btnAjout_clicked();
+    void supprTodo();
+
+    void onTodoKeyReleased(QKeyEvent *event);
+    void on_pushButton_clicked();
 
 private:
 	void populate();
@@ -32,6 +35,7 @@ private:
 	Ui::FormGestionTodo *ui;
 	int _personneId;
     TreeModel *model;
+    QAction *supprTodoAct;
 };
 
 #endif // FORMGESTIONTODO_H
