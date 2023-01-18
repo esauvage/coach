@@ -2,9 +2,10 @@
 #include "ui_formgestiontodo.h"
 
 #include "treemodel.h"
-#include "taskdelegate.h"
+//#include "taskdelegate.h"
 #include "taskdonedelegate.h"
 #include "mysortfilterproxymodel.h"
+#include "mytreeview.h"
 
 #include <QKeyEvent>
 
@@ -15,17 +16,16 @@ FormGestionTodo::FormGestionTodo(QWidget *parent) :
 {
 	ui->setupUi(this);
     const QStringList headers({tr("Description"), tr(""), tr("Date"), tr("Récurrence")});
-
     model = new TreeModel(headers);
     auto proxyModel = new MySortFilterProxyModel(this, true);
     proxyModel->setExcludeDates(true);
     proxyModel->setSourceModel(model);
 	proxyModel->setFilterKeyColumn(2);
 	ui->treeTodo->setModel(proxyModel);
-    TaskDelegate *taskDelegate = new TaskDelegate();
-    ui->treeTodo->setItemDelegate(taskDelegate);
+//    TaskDelegate *taskDelegate = new TaskDelegate();
+//    ui->treeTodo->setItemDelegate(taskDelegate);
     ui->treeTodo->hideColumn(2);
-    connect(taskDelegate, &TaskDelegate::keyReleased, this, &FormGestionTodo::onTodoKeyReleased);
+    connect(ui->treeTodo, &MyTreeView::keyReleased, this, &FormGestionTodo::onTodoKeyReleased);
     auto proxyDoneModel = new MySortFilterProxyModel(this, false);
     proxyDoneModel->setExcludeDates(false);
     proxyDoneModel->setSourceModel(model);
@@ -61,7 +61,7 @@ void FormGestionTodo::on_btnAjout_clicked()
 void FormGestionTodo::supprTodo()
 {
 //    QItemSelection index = static_cast<MySortFilterProxyModel *>(ui->treeTodo->model())->mapSelectionToSource(ui->treeTodo->selectionModel()->selection());
-    auto index = ui->treeTodo->selectionModel()->selectedIndexes();
+    auto index = ui->treeTodo->selectionModel()->selectedRows();
     model->removeRows(index.first().row(), index.count(), index.first());
 }
 

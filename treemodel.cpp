@@ -14,9 +14,15 @@ TreeModel::TreeModel(const QStringList &headers, QObject *parent)
     Q_UNUSED(headers);
 	_dbManager = static_cast<CoachApplication *>(QApplication::instance())->dbManager();
 	rootItem = new TreeTask();
-	QTimer timer;
-	timer.setInterval(1000);
-	connect(&timer,  SIGNAL(timeout()), this, SLOT(onTimeout()));
+    auto i = 0;
+    for (auto header : headers)
+    {
+        setHeaderData(i++, Qt::Horizontal, header);
+    }
+    QTimer *timer = new QTimer(this);
+    timer->setInterval(1000);
+    connect(timer, &QTimer::timeout, this, &TreeModel::onTimeout);
+    timer->start(1000);
 }
 //! [0]
 
@@ -175,8 +181,8 @@ bool TreeModel::removeRows(int position, int rows, const QModelIndex &parent)
     }
     bool success = parentItem->removeChildren(position, rows);
     endRemoveRows();
-
-	return success;
+    emit dataChanged(parent, parent.sibling(position+rows, parentItem->columnCount()-1), {Qt::DisplayRole});
+    return success;
 }
 
 void TreeModel::populate(int personneId)

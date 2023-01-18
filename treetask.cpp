@@ -10,7 +10,7 @@
 //! [0]
 TreeTask::TreeTask(TreeTask *parent)
     :parentItem(parent),
-      _date(QDateTime())
+      _date(QDateTime()), _elapsed(-1)
 {}
 
 TreeTask::TreeTask(const TreeTask &ref)
