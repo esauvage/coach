@@ -291,3 +291,24 @@ void TreeModel::setDones(const QList<TreeTask> &dones)
     }
     endInsertRows();
 }
+
+TreeTask * TreeModel::getLastDoneItem(const QString &nom) const
+{
+	TreeTask * r = nullptr;
+	for (auto i : rootItem->childItems())
+	{
+		if ((i->nom() == nom) && i->date().isValid())
+		{
+			if (!r)
+			{
+				r = i;
+				continue;
+			}
+			if (i->date() > r->date())
+			{
+				r = i;
+			}
+		}
+	}
+	return r;
+}

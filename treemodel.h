@@ -53,13 +53,14 @@ public:
     bool removeRows(int position, int rows,
                     const QModelIndex &parent = QModelIndex()) override;
 	void populate(int personneId);
+	TreeTask *getItem(const QModelIndex &index) const;
+	TreeTask *getLastDoneItem(const QString &nom) const;
 
 private slots:
 	void onTimeout();
 
 private:
 	void setupModelData(const QStringList &lines, TreeTask *parent);
-	TreeTask *getItem(const QModelIndex &index) const;
 	void setDones(const QList<TreeTask> &dones);
 
 	TreeTask *rootItem;

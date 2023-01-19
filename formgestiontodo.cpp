@@ -8,6 +8,7 @@
 #include "mytreeview.h"
 
 #include <QKeyEvent>
+#include <QAction>
 
 FormGestionTodo::FormGestionTodo(QWidget *parent) :
 	QWidget(parent),
