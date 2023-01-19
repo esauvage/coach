@@ -259,7 +259,20 @@ void DbManager::supprimeTodo(int id) const
 	if (suppr.lastError().type() != QSqlError::NoError)
 	{
 		qDebug() << suppr.lastError();
-	}
+    }
+}
+
+void DbManager::modifDone(const TreeTask &v) const
+{
+    QSqlQuery update;
+    update.prepare("UPDATE DONE SET NOM = :nom, DATE = :date WHERE ID = :id");
+    update.bindValue(":nom", v.nom());
+    update.bindValue(":date", v.date());
+    update.bindValue(":id", v.id());
+    qDebug() << update.lastQuery();
+    update.exec();
+    qDebug() << update.executedQuery();
+    qDebug() << update.lastError();
 }
 
 int DbManager::addDone(const QString &nom, const QDateTime &date, int personneId) const

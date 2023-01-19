@@ -27,7 +27,8 @@ public:
 	void modifTodo(const TreeTask &v) const;
 	int addTodo(const QString &nom, int personneId) const;
 	void supprimeTodo(int id) const;
-	int addDone(const QString &nom, const QDateTime &date, int personneId) const;
+    void modifDone(const TreeTask &v) const;
+    int addDone(const QString &nom, const QDateTime &date, int personneId) const;
 	void supprimeDone(int id) const;
 	QList<TreeTask> getDones(int personneId) const;
 private:

@@ -259,6 +259,10 @@ bool TreeModel::setData(const QModelIndex &current, const QVariant &value, int r
 			{
 				_dbManager->modifTodo(*item);
 			}
+            else
+            {
+                _dbManager->modifDone(*item);
+            }
 		}
 		emit dataChanged(current, current, {Qt::DisplayRole, role});
 	}
