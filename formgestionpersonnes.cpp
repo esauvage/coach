@@ -4,7 +4,6 @@
 #include <QDialogButtonBox>
 #include <QSettings>
 
-#include "formeditpersonne.h"
 #include "coachapplication.h"
 #include "dbmanager.h"
 
@@ -60,6 +59,7 @@ void FormGestionPersonnes::on_comboBox_currentIndexChanged(int index)
 {
 	Q_UNUSED(index);
 	personne.setId(-1);
+    ui->btnEdit->hide();
 	if (ui->comboBox->currentData().toInt() < 0) return;
 	emit curUserChanged();
 	if (ui->comboBox->currentData().toInt())

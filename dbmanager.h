@@ -18,7 +18,7 @@ public:
 	void changePassword(int personneId, const QString& nPasswd) const;
 	Personne getPersonne(const int id, const QString &password) const;
 	void supprimePersonne(int id) const;
-	QList<Seance> getSeances() const;
+    QList<Seance> getSeances(int personneId) const;
 	void addSeance(const Seance &v) const;
 	void modifSeance(const Seance &v) const;
 	void supprimeSeance(const Seance &v) const;

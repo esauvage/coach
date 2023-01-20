@@ -4,25 +4,37 @@
 #include <QDialogButtonBox>
 
 #include "formeditseance.h"
+#include "coachapplication.h"
 #include "dbmanager.h"
-
 
 FormGestionSeances::FormGestionSeances(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::FormGestionSeances)
+    ui(new Ui::FormGestionSeances),
+    _formEdtSeance(new FormEditSeance(_seance))
+
 {
     ui->setupUi(this);
+    _dbManager = static_cast<CoachApplication *>(QApplication::instance())->dbManager();
+    ui->verticalLayout->addWidget(_formEdtSeance);
+    connect(_formEdtSeance, &FormEditSeance::changed, this, &FormGestionSeances::onChanged);
 }
 
 FormGestionSeances::~FormGestionSeances()
 {
     delete ui;
+    delete _formEdtSeance;
 }
 
 
 void FormGestionSeances::setPersonneId(int id)
 {
 	_personneId = id;
+    _seance.setPersonneId(id);
+    auto seances = _dbManager->getSeances(id);
+    for (auto i : seances)
+    {
+        ui->cbxSeances->addItem(QString("Le %1 de %2 à %3").arg(i.date().toString()).arg(i.debut().toString()).arg(i.fin().toString()),i.id());
+    }
 }
 
 void FormGestionSeances::on_btnAjout_clicked()
@@ -70,3 +82,19 @@ void FormGestionSeances::ajoutValide()
     _hlayout = nullptr;
     update();
 }
+
+void FormGestionSeances::on_cbxSeances_currentIndexChanged(int index)
+{
+    if (ui->cbxSeances->count() < 1) return;
+    if (ui->cbxSeances->currentData().toInt() > 0)
+        _formEdtSeance->setSeance(_dbManager->getSeance(ui->cbxSeances->currentData().toInt()));
+}
+
+void FormGestionSeances::onChanged()
+{
+    const Seance & seance = _formEdtSeance->seance();
+    _dbManager->modifSeance(seance);
+    ui->cbxSeances->setItemText(ui->cbxSeances->currentIndex(), QString("Le %1 de %2 à %3").arg(seance.date().toString())
+                                .arg(seance.debut().toString()).arg(seance.fin().toString()));
+}
+

@@ -15,7 +15,8 @@ CoachMainWindow::CoachMainWindow(QWidget *parent)
 	, _formGestSeances(nullptr)
 {
     ui->setupUi(this);
-	connect(ui->login, SIGNAL(curUserChanged()),
+    ui->tabWidget->hide();
+    connect(ui->login, SIGNAL(curUserChanged()),
 			this, SLOT(onCurUserChanged()));
 	connect(ui->login, SIGNAL(editPersonneRequested(Personne&)),
 			this, SLOT(onEditPersonneRequested(Personne&)));
@@ -59,7 +60,12 @@ void CoachMainWindow::onCurUserChanged()
 	_formGestTodo = nullptr;
 	if (_formGestSeances) delete _formGestSeances;
 	_formGestSeances = nullptr;
-	if (ui->login->curPersonId() <= 0) return;
+    if (ui->login->curPersonId() <= 0)
+    {
+        ui->tabWidget->hide();
+        return;
+    }
+    ui->tabWidget->show();
 	_formGestTodo = new FormGestionTodo();
 	QGridLayout * l = dynamic_cast<QGridLayout *>(ui->tabTodo->layout());
 	if (!l)

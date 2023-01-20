@@ -17,7 +17,7 @@
    <item>
     <widget class="QLabel" name="lblPersonne">
      <property name="text">
-      <string>TextLabel</string>
+      <string>Gérer ses séances</string>
      </property>
     </widget>
    </item>

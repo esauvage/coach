@@ -1,10 +1,8 @@
 #include "seance.h"
 
-#include "personne.h"
-
 Seance::Seance()
+    :_activiteId(-1)
 {
-
 }
 
 QDate Seance::date() const
@@ -47,12 +45,22 @@ void Seance::setId(int id)
     _id = id;
 }
 
-Personne *Seance::personne() const
+int Seance::personneId() const
 {
-    return _personne;
+    return _personneId;
 }
 
-void Seance::setPersonne(Personne *personne)
+void Seance::setPersonneId(int personneId)
 {
-    _personne = personne;
+    _personneId = personneId;
+}
+
+int Seance::activiteId() const
+{
+    return _activiteId;
+}
+
+void Seance::setActiviteId(int newActiviteId)
+{
+    _activiteId = newActiviteId;
 }

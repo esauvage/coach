@@ -26,6 +26,8 @@ private slots:
     void on_btnAjout_clicked();
     void ajoutAnnule();
     void ajoutValide();
+    void on_cbxSeances_currentIndexChanged(int index);
+    void onChanged();
 
 private:
     Ui::FormGestionSeances *ui;

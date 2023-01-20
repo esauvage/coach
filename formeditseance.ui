@@ -14,15 +14,6 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
-    <widget class="QDateEdit" name="edtDate"/>
-   </item>
-   <item row="1" column="2">
-    <widget class="QTimeEdit" name="edtFin"/>
-   </item>
-   <item row="1" column="1">
-    <widget class="QTimeEdit" name="edtDebut"/>
-   </item>
    <item row="0" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
@@ -34,6 +25,36 @@
     <widget class="QLabel" name="label_2">
      <property name="text">
       <string>Heure de début :</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QDateEdit" name="edtDate"/>
+   </item>
+   <item row="1" column="1">
+    <widget class="QTimeEdit" name="edtDebut"/>
+   </item>
+   <item row="1" column="2">
+    <widget class="QTimeEdit" name="edtFin"/>
+   </item>
+   <item row="0" column="2">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Heure de fin :</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="3">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Activité :</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3">
+    <widget class="QComboBox" name="cbxActivite">
+     <property name="editable">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

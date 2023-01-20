@@ -3,8 +3,6 @@
 
 #include <QDateTime>
 
-class Personne;
-
 class Seance
 {
 public:
@@ -21,15 +19,18 @@ public:
     int id() const;
     void setId(int id);
 
-    Personne *personne() const;
-    void setPersonne(Personne *personne);
+    int personneId() const;
+    void setPersonneId(int personneId);
+    int activiteId() const;
+    void setActiviteId(int newActiviteId);
 
 private:
     QDate _date;
     QTime _debut;
     QTime _fin;
     int _id;//On a besoin d'un identifiant
-    Personne * _personne = nullptr;
+    int _personneId;
+    int _activiteId;
 };
 
 #endif // SEANCE_H
