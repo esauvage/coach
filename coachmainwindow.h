@@ -6,6 +6,7 @@
 class Personne;
 class FormEditPersonne;
 class FormGestionTodo;
+class FormGestionSeances;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class CoachMainWindow; }
@@ -28,5 +29,6 @@ private:
     Ui::CoachMainWindow *ui;
 	FormEditPersonne *_formEditPersonne;
 	FormGestionTodo * _formGestTodo;
+	FormGestionSeances * _formGestSeances;
 };
 #endif // COACHMAINWINDOW_H

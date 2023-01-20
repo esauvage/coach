@@ -3,6 +3,7 @@
 
 #include "formeditpersonne.h"
 #include "formgestiontodo.h"
+#include "formgestionseances.h"
 
 #include <QGridLayout>
 
@@ -11,6 +12,7 @@ CoachMainWindow::CoachMainWindow(QWidget *parent)
 	, ui(new Ui::CoachMainWindow)
 	, _formEditPersonne(nullptr)
 	, _formGestTodo(nullptr)
+	, _formGestSeances(nullptr)
 {
     ui->setupUi(this);
 	connect(ui->login, SIGNAL(curUserChanged()),
@@ -31,6 +33,11 @@ void CoachMainWindow::onEditPersonneRequested(Personne & p)
 		delete _formGestTodo;
 		_formGestTodo = nullptr;
 	}
+	if (_formGestSeances)
+	{
+		delete _formGestSeances;
+		_formGestSeances = nullptr;
+	}
 	if (!_formEditPersonne)
 	{
 		_formEditPersonne = new FormEditPersonne(p);
@@ -50,11 +57,25 @@ void CoachMainWindow::onCurUserChanged()
 	_formEditPersonne = nullptr;
 	if (_formGestTodo) delete _formGestTodo;
 	_formGestTodo = nullptr;
+	if (_formGestSeances) delete _formGestSeances;
+	_formGestSeances = nullptr;
 	if (ui->login->curPersonId() <= 0) return;
 	_formGestTodo = new FormGestionTodo();
-	QGridLayout * l = dynamic_cast<QGridLayout *>(centralWidget()->layout());
+	QGridLayout * l = dynamic_cast<QGridLayout *>(ui->tabTodo->layout());
+	if (!l)
+	{
+		l = new QGridLayout(ui->tabTodo);
+	}
 	l->addWidget(_formGestTodo, 1, 0);
 	_formGestTodo->setPersonneId(ui->login->curPersonId());
+	_formGestSeances = new FormGestionSeances();
+	l = dynamic_cast<QGridLayout *>(ui->tabSeances->layout());
+	if (!l)
+	{
+		l = new QGridLayout(ui->tabSeances);
+	}
+	l->addWidget(_formGestSeances, 1, 0);
+	_formGestSeances->setPersonneId(ui->login->curPersonId());
 }
 
 void CoachMainWindow::onEditPersonFinished()

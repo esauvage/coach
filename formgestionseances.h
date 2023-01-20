@@ -20,6 +20,8 @@ class FormGestionSeances : public QWidget
 public:
     explicit FormGestionSeances(QWidget *parent = nullptr);
     ~FormGestionSeances();
+	void setPersonneId(int id);
+
 private slots:
     void on_btnAjout_clicked();
     void ajoutAnnule();
@@ -30,7 +32,8 @@ private:
     FormEditSeance * _formEdtSeance = nullptr;
     QDialogButtonBox * _hlayout = nullptr;
     DbManager * _dbManager = nullptr;
-    Seance _seance;
+	int _personneId;
+	Seance _seance;
 };
 
 #endif // FORMGESTIONSEANCES_H

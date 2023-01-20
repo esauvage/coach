@@ -19,6 +19,12 @@ FormGestionSeances::~FormGestionSeances()
     delete ui;
 }
 
+
+void FormGestionSeances::setPersonneId(int id)
+{
+	_personneId = id;
+}
+
 void FormGestionSeances::on_btnAjout_clicked()
 {
     ui->btnAjout->hide();
