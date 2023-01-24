@@ -4,6 +4,7 @@
 #include <QWidget>
 
 #include "seance.h"
+#include "dbmanager.h"
 
 namespace Ui {
 class FormEditSeance;
@@ -21,7 +22,7 @@ public:
     void setSeance(const Seance &seance);
 signals:
     void changed();
-    void activiteChanged();
+//    void activiteChanged();
 private slots:
     void on_edtDate_editingFinished();
 
@@ -29,11 +30,12 @@ private slots:
 
     void on_edtFin_editingFinished();
 
-    void on_cbxActivite_editTextChanged(const QString &arg1);
+    void activiteChanged();
 
 private:
     Ui::FormEditSeance *ui;
     Seance & _seance;
+    DbManager *_dbManager = nullptr;
 };
 
 #endif // FORMEDITSEANCE_H

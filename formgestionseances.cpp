@@ -30,6 +30,7 @@ void FormGestionSeances::setPersonneId(int id)
 {
 	_personneId = id;
     _seance.setPersonneId(id);
+    ui->cbxSeances->clear();
     auto seances = _dbManager->getSeances(id);
     for (auto i : seances)
     {
@@ -40,6 +41,10 @@ void FormGestionSeances::setPersonneId(int id)
 void FormGestionSeances::on_btnAjout_clicked()
 {
     ui->btnAjout->hide();
+    _seance=Seance();
+    _seance.setDate(QDate::currentDate());
+    _seance.setFin(QTime::currentTime());
+    _seance.setDebut(_seance.fin().addSecs(-15*60));
     if (!_formEdtSeance)
     {
         _formEdtSeance = new FormEditSeance(_seance);
@@ -67,6 +72,7 @@ void FormGestionSeances::ajoutAnnule()
     ui->verticalLayout->removeWidget(_hlayout);
     delete _hlayout;
     _hlayout = nullptr;
+    _seance = _dbManager->getSeance(ui->cbxSeances->currentData().toInt());
     update();
 }
 
@@ -80,11 +86,12 @@ void FormGestionSeances::ajoutValide()
     ui->verticalLayout->removeWidget(_hlayout);
     delete _hlayout;
     _hlayout = nullptr;
-    update();
+    setPersonneId(_seance.personneId());
 }
 
 void FormGestionSeances::on_cbxSeances_currentIndexChanged(int index)
 {
+    Q_UNUSED(index);
     if (ui->cbxSeances->count() < 1) return;
     if (ui->cbxSeances->currentData().toInt() > 0)
         _formEdtSeance->setSeance(_dbManager->getSeance(ui->cbxSeances->currentData().toInt()));
