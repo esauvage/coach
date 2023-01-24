@@ -1,6 +1,7 @@
 #include "formeditseance.h"
 #include "ui_formeditseance.h"
 
+#include "coachapplication.h"
 #include <QLineEdit>
 
 FormEditSeance::FormEditSeance(Seance & seance, QWidget *parent) :
@@ -13,6 +14,11 @@ FormEditSeance::FormEditSeance(Seance & seance, QWidget *parent) :
     ui->edtDebut->setDateTime(QDateTime::currentDateTime());
     ui->edtFin->setDateTime(QDateTime::currentDateTime());
     connect(ui->cbxActivite->lineEdit(), &QLineEdit::editingFinished, this, &FormEditSeance::activiteChanged);
+    _dbManager = static_cast<CoachApplication *>(QApplication::instance())->dbManager();
+    for (auto activite : _dbManager->getActivites())
+    {
+        ui->cbxActivite->addItem(activite.first, activite.second);
+    }
 }
 
 FormEditSeance::~FormEditSeance()
@@ -52,7 +58,10 @@ void FormEditSeance::on_edtFin_editingFinished()
 }
 
 
-void FormEditSeance::on_cbxActivite_editTextChanged(const QString &arg1)
+void FormEditSeance::activiteChanged()
 {
+    if (ui->cbxActivite->currentData().toInt()<1)
+    {
+        _dbManager->addActivite(ui->cbxActivite->currentText());
+    }
 }
-

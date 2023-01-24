@@ -31,6 +31,8 @@ public:
     int addDone(const QString &nom, const QDateTime &date, int personneId) const;
 	void supprimeDone(int id) const;
 	QList<TreeTask> getDones(int personneId) const;
+    QList<QPair <QString, int> > getActivites() const;
+    int addActivite(const QString &nom) const;
 private:
     QSqlDatabase m_db;
 };

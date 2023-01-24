@@ -331,5 +331,40 @@ QList<TreeTask> DbManager::getDones(int personneId) const
 		v.setDate(query.value(2).toDateTime());
 		r << v;
 	}
-	return r;
+    return r;
+}
+
+QList<QPair<QString, int> > DbManager::getActivites() const
+{
+    QList<QPair<QString, int> > r;
+    QSqlQuery query;
+    query.prepare("SELECT ID, NOM FROM ACTIVITES");
+    query.exec();
+    while (query.next()) {
+        QPair<QString, int> v;
+        v.first = query.value(1).toString();
+        v.second = query.value(0).toInt();
+        r << v;
+    }
+    return r;
+}
+
+int DbManager::addActivite(const QString &nom) const
+{
+    QSqlQuery insert;
+    insert.prepare("INSERT INTO ACTIVITES (NOM) VALUES (:nom)");
+    insert.bindValue(":nom", nom);
+    qDebug() << insert.lastQuery();
+    insert.exec();
+    if (insert.lastError().type() != QSqlError::NoError)
+    {
+        qDebug() << insert.executedQuery();
+        qDebug() << insert.lastError();
+    }
+    insert.prepare("SELECT LAST_INSERT_ROWID();");
+    insert.exec();
+    if (insert.next()) {
+        return insert.value(0).toInt();
+    }
+    return -1;
 }
