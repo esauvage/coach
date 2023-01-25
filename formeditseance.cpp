@@ -31,6 +31,7 @@ Seance &FormEditSeance::seance() const
     _seance.setDate(ui->edtDate->date());
     _seance.setDebut(ui->edtDebut->time());
     _seance.setFin(ui->edtFin->time());
+	_seance.setActiviteId(ui->cbxActivite->currentData().toInt());
     return _seance;
 }
 
@@ -39,6 +40,7 @@ void FormEditSeance::setSeance(const Seance &seance)
     ui->edtDate->setDate(seance.date());
     ui->edtDebut->setTime(seance.debut());
     ui->edtFin->setTime(seance.fin());
+	ui->cbxActivite->setCurrentIndex(ui->cbxActivite->findData(seance.activiteId()));
     _seance = seance;
 }
 

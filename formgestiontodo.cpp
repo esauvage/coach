@@ -51,6 +51,11 @@ void FormGestionTodo::setPersonneId(int id)
 {
     _personneId = id;
     model->populate(id);
+	_courses.setTable("COURSES");
+	_courses.setFilter(QString("PERSONNE_ID = %1").arg(id));
+	_courses.select();
+	ui->lstCourses->setModel(&_courses);
+	ui->lstCourses->hideColumn(0);
 }
 
 void FormGestionTodo::on_btnAjout_clicked()

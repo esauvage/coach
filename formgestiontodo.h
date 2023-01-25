@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QModelIndex>
+#include <QSqlTableModel>
 
 #include "treemodel.h"
 
@@ -36,6 +37,7 @@ private:
 	int _personneId;
     TreeModel *model;
     QAction *supprTodoAct;
+	QSqlTableModel _courses;
 };
 
 #endif // FORMGESTIONTODO_H

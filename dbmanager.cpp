@@ -130,7 +130,7 @@ QList<Seance> DbManager::getSeances(int personneId) const
 {
 	QList <Seance> r;
     QSqlQuery query;
-    query.prepare("SELECT ID, DATE, DEBUT, FIN, ACTIVITE_ID FROM SEANCES WHERE PERSONNE_ID = :personneId");
+	query.prepare("SELECT ID, DATE, DEBUT, FIN, ACTIVITE_ID FROM SEANCES WHERE PERSONNE_ID = :personneId ORDER BY DATE, DEBUT DESC");
     query.bindValue(":personneId", personneId);
     query.exec();
     while (query.next()) {
@@ -321,7 +321,7 @@ QList<TreeTask> DbManager::getDones(int personneId) const
 {
 	QList<TreeTask> r;
 	QSqlQuery query;
-	query.prepare("SELECT ID, NOM, DATE FROM DONE WHERE PERSONNE_ID = :id");
+	query.prepare("SELECT ID, NOM, DATE FROM DONE WHERE PERSONNE_ID = :id ORDER BY DATE DESC");
 	query.bindValue(":id", personneId);
 	query.exec();
 	while (query.next()) {
